@@ -1,0 +1,945 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hps">
+  <meta name="keywords" content="青春|技术">
+  
+    <meta name="description" content="机器学习是目前信息技术中最激动人心的方向之一，本文为学习吴恩达的机器学习课程后所做的笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="吴恩达机器学习笔记1: 何为机器学习">
+<meta property="og:url" content="http://1291945816.github.io/2022/01/06/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01-%E4%BD%95%E4%B8%BA%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="pSomng&#39;s blog">
+<meta property="og:description" content="机器学习是目前信息技术中最激动人心的方向之一，本文为学习吴恩达的机器学习课程后所做的笔记。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://1291945816.github.io/img/ml.png">
+<meta property="article:published_time" content="2022-01-06T20:40:22.000Z">
+<meta property="article:modified_time" content="2023-12-23T05:06:34.000Z">
+<meta property="article:author" content="Hps">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="人工智能">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://1291945816.github.io/img/ml.png">
+  
+  
+  
+  <title>吴恩达机器学习笔记1: 何为机器学习 - pSomng&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1291945816.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"N6Yv4jtmqdE8UlvY3sF47iku-MdYXbMMI","app_key":"YEW5UmNoyIuo9iD5knjfctWf","server_url":null,"path":"window.location.pathname","ignore_local":true}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="pSomng's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pSomng&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/comment/">
+                <i class="iconfont icon-bookmark-fill"></i>
+                留言板
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="吴恩达机器学习笔记1: 何为机器学习"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-01-06 20:40" pubdate>
+          2022/01/06 20:40
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          8 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">吴恩达机器学习笔记1: 何为机器学习</h1>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>机器学习是目前信息技术中最激动人心的方向之一，本文为学习吴恩达的机器学习课程后所做的笔记。<span id="more"></span></p>
+</blockquote>
+<h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h3><p>在我们的日常生活中都在不知不觉使用了机器学习的算法数次，如使用谷歌、百度获取个人所需的内容，使用电子邮件垃圾筛选器，知乎上的个性化推荐等等。机器学习受欢迎的原因不仅在于它在人工智能领域的应用，它还涉及了各个行业和基础科学，如机器人、计算生物学等。</p>
+<p><strong>一些机器学习的案例</strong></p>
+<ul>
+<li><strong>数据库挖掘(Database mining)：</strong>大量的数据集来源于网络与自动化技术的增长，如来源于Web点击数据，医疗记录，计算生物学，工程方面的数据等。</li>
+<li><strong>应用程序不能手动编程(Application can’t program by hand):</strong> 自主直升机、手写识别、大部分NLP、计算机视觉等。</li>
+<li><strong>自定制程序(Self-customizing programs):</strong> 亚马逊、网飞的产品推荐等。</li>
+<li><strong>理解人类学习(大脑)</strong></li>
+</ul>
+<h3 id="2-机器学习定义"><a href="#2-机器学习定义" class="headerlink" title="2 机器学习定义"></a>2 机器学习定义</h3><p><strong>Arthur Samuel(1959): </strong> Field of study that gives computers the ability to learn  without being explicitly programmed 。</p>
+<blockquote>
+<p>译: 在没有明确编程下，让计算机具有学习能力的研究领域。</p>
+</blockquote>
+<p><strong>Tom Mitchell(1998): </strong>A computer program is said to learn from experience E with respect to some task T and some performance measure P, if its  performance on T, as measured by P, improves  with experience E。</p>
+<blockquote>
+<p>译: 一个程序被认为能从经验E中学习，解决任务T，达到性能度量值P，当且仅当，有了经验E后经过P评判，程序在处理T时的性能有所提升。</p>
+</blockquote>
+<p><img src="image-20220106160317350.png" srcset="/img/loading.gif" lazyload alt="图1"></p>
+<p>机器学习算法主要分为两大类:</p>
+<ul>
+<li>监督学习：教计算机如何去完成任务。</li>
+<li>无监督学习：让计算机自己学习。</li>
+</ul>
+<p>其他类型: 强化学习、推荐系统。 </p>
+<h3 id="3-监督学习-Supervised-Learning"><a href="#3-监督学习-Supervised-Learning" class="headerlink" title="3 监督学习(Supervised Learning)"></a>3 监督学习(Supervised Learning)</h3><blockquote>
+<p> <strong>定义:</strong> 根据<strong>已有的数据集(包含正确的结果)</strong>，知道输入和输出结果之间的关系。根据这种已知的关系，训练得到一个最优的模型</p>
+</blockquote>
+<h4 id="3-1-回归-Regression"><a href="#3-1-回归-Regression" class="headerlink" title="3.1 回归(Regression)"></a>3.1 回归(Regression)</h4><p>如图2所示是来自于某个研究所收集的房价数据，横轴表示房子的面积（单位为平方英尺），纵轴表示房价（单位为千美元）。基于这一组数据，假如有一个朋友有一套750平方英尺的房子，现在他希望把房子卖掉，并且他想知道这房子能卖多少钱?</p>
+<p><img src="image-20220106161139777.png" srcset="/img/loading.gif" lazyload alt="图2-房价预测"></p>
+<p>试想一下，机器学习算法将会如何帮助我们?（根据数据集采用不同的曲线去拟合，以便达到最优模型）</p>
+<ol>
+<li>在这组数据中画一条直线，可以估计这套房子能卖$150,000</li>
+<li>使用二次方程去拟合，可以估计这套房子能卖$200,000</li>
+<li>…等</li>
+</ol>
+<p>上述预测房价的这个问题可以归为<strong>回归问题</strong>，尽管房价实际上是一系列离散的值，但是通常我们又把房价看成是一个连续的数值。</p>
+<p><strong>回归:</strong> 预测连续值输出（即预测的值是连续的，如房价）。</p>
+<h4 id="3-2-分类-Classification"><a href="#3-2-分类-Classification" class="headerlink" title="3.2 分类(Classification)"></a>3.2 分类(Classification)</h4><p>假设我们打算通过查看病历去推测乳腺癌良性与否，有这样一组数据：在这个数据集里面，横轴表示肿瘤大小，纵轴的1和0表示是或者不是恶性肿瘤。如图3，有5个良性的肿瘤样本和5个恶性肿瘤样本在图中标出（图3提供了两种不同的绘制图的方式）。</p>
+<p><img src="image-20220106165157945.png" srcset="/img/loading.gif" lazyload alt="图3-乳腺肿瘤样本图"></p>
+<p>假设有这样的一个人，不幸检查出了乳腺肿瘤，并知道其大小，现在机器学习的问题在于，能否估算出该肿瘤是恶性的还是良性？这是一个<strong>分类问题</strong>。</p>
+<p><strong>分类: </strong>预测离散的输出值。</p>
+<p>在分类问题中，也有可能输出多个值，但这也是属于分类问题。</p>
+<p>在现实例子中，可能遇到的不止一种特征，如在肿瘤问题中，不仅了解到肿瘤的尺寸，还了解对应患者的年龄，也可能还有 肿块密度、肿瘤细胞尺寸的一致性和形状的一致性等，如图4所示。在实际的算法处理中，我们可能更希望能够利用更多特征，而存储这些特征可能会导致内存的不够用，该问题可以通过后续的<strong>支持向量机</strong>算法中的某个技巧去解决。</p>
+<p><img src="image-20220106170229091.png" srcset="/img/loading.gif" lazyload alt="图4-多特征的肿瘤数据"></p>
+<p>下面是一个小测验，如图5所示。</p>
+<p><img src="image-20220106170845235.png" srcset="/img/loading.gif" lazyload alt="图5-测验"></p>
+<p><strong>问题1是一个回归问题:</strong> 货物的数量可以看作一个实数，连续的值，相对的，卖出去的物品数目也可以看作是连续值。</p>
+<p><strong>问题2是一个分类问题: </strong> 需要判断的是账户是否被盗，而可以使用0和1分别表示被盗与否，这个输出的值属于离散值。</p>
+<h3 id="4-无监督学习-Unsupervised-Learning"><a href="#4-无监督学习-Unsupervised-Learning" class="headerlink" title="4 无监督学习(Unsupervised Learning)"></a>4 无监督学习(Unsupervised Learning)</h3><blockquote>
+<p>相比于监督学习，无监督学习中的数据集并不会提供标签或者是有相同的标签，学习算法需要从该数据集中根据数据的结构去进行分类。如图5所示，无监督学习能够判断出数据有两个不同的聚集簇，所以它叫做聚类算法。</p>
+</blockquote>
+<p><img src="无监督学习.png" srcset="/img/loading.gif" lazyload alt="图5-无监督学习"></p>
+<p>聚类算法和无监督学习算法也可以用在其他问题上，如基因学的理解应用，其思想是输入一组不同的个体，对于其中的个体，需要分析出它们是否具有一个特定的基因。如图6所示，不同颜色都展示个体在基因表达方面的程度，需要做的就是采用聚类算法把个体聚类到不同的类或不同类型的组。</p>
+<p><img src="image-20220106194219314.png" srcset="/img/loading.gif" lazyload alt="图6-个体基因表达图"></p>
+<p>聚类还可以有其他应用场景，如图7所示。</p>
+<p><img src="image-20220106195228530.png" srcset="/img/loading.gif" lazyload alt="图7-聚类的其他应用场景"></p>
+<p>聚类只是无监督学习中的一种，另外一种的应用场景如图8所示，即<strong>鸡尾酒宴问题</strong>。</p>
+<p><img src="image-20220106195500137.png" srcset="/img/loading.gif" lazyload alt="图8-鸡尾酒宴问题"></p>
+<p>所谓鸡尾酒宴问题，就是在一个满是人的房间里，都在互相交谈，声音彼此重叠，对相对而坐的两个人来说，有可能互相之间听不到对方在说什么。现在把问题简化为两个人坐在同一个房间里，里面放置着两个麦克风，距离不同，让两个人同时说话，如图8。这样每个麦克风就记录下了两者一起说话的声音。现在，可以使用无监督学习算法，将它们区分开来。</p>
+<p>对于初学者来说，这个无监督学习算法感觉实现起来有点复杂（<del>没错，就是我了</del>）。但由研究人员花了大量时间得出的代码却是相当的简单:</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs matlab">[W,s,v] = svd((<span class="hljs-built_in">repmat</span>(sum(x.*x,<span class="hljs-number">1</span>),<span class="hljs-built_in">size</span>(x,<span class="hljs-number">1</span>),<span class="hljs-number">1</span>).*x)*x&#x27;);<br></code></pre></td></tr></table></figure>
+<p>一个小测验，如图9所示。</p>
+<p><img src="image-20220106201048218.png" srcset="/img/loading.gif" lazyload alt="图9-无监督学习测验"></p>
+<p>下面分析四个选项:</p>
+<ol>
+<li>这个是垃圾邮件分类问题，是一个<strong>监督学习问题</strong>（提供了标记好的数据集供学习）。</li>
+<li>这个是新闻分类的问题，这个属于<strong>无监督学习问题</strong>，主要是通过根据不同文章的内容，相似的便聚到一起。</li>
+<li>这个是细分市场问题，这个可以看作是<strong>无监督学习问题</strong>，主要是根据数据让算法进一步细分市场。</li>
+<li>这个是糖尿病问题，类似于上文说到的乳腺癌问题，提供了已经标记的好的数据集（标记患者是否患糖尿病），所以它是<strong>监督学习问题</strong>。</li>
+</ol>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">#机器学习</a>
+      
+        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">#人工智能</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>吴恩达机器学习笔记1: 何为机器学习</div>
+      <div>http://1291945816.github.io/2022/01/06/吴恩达机器学习笔记1-何为机器学习/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hps</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年1月6日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年12月23日</div>
+        </div>
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/01/10/Linux%E5%86%85%E6%A0%B8%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/" title="Linux内核学习(二)：内存寻址">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Linux内核学习(二)：内存寻址</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/01/05/%E4%B8%BA%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8B%E7%9A%84ubuntu-1804%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81ip/" title="为虚拟机下的ubuntu-1804配置静态ip">
+                        <span class="hidden-mobile">为虚拟机下的ubuntu-1804配置静态ip</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.3.2/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.3.2/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comment-waline-qx71mhz0j-1291945816.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["mail"],"lang":"zh-CN","emoji":["https://unpkg.com/@waline/emojis@1.0.1/bilibili","https://unpkg.com/@waline/emojis@1.0.1/qq","https://unpkg.com/@waline/emojis@1.0.1/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love" style="color:red"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      <!-- 黄丕松增 -->
+      <!--《添加网站运行时间 -->
+<br/>
+
+<span id="bulidSiteTime">载入建站时间...</span>
+<br/>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+var now = new Date(); 
+
+function createtime() {
+    //此处修改你的建站时间或者网站上线时间
+    var grt = new Date('11/20/2021 21:00:00');
+    now.setTime(now.getTime() + 250);
+    days = (now - grt) / 1000 / 60 / 60 / 24;
+
+    dnum = Math.floor(days);
+    hours = (now - grt) / 1000 / 60 / 60 - (24 * dnum);
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+        hnum = "0" + hnum;
+    }
+    minutes = (now - grt) / 1000 / 60 - (24 * 60 * dnum) - (60 * hnum);
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+        mnum = "0" + mnum;
+    }
+    seconds = (now - grt) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+        snum = "0" + snum;
+    }
+    nowYear=now.getFullYear();
+    document.getElementById("bulidSiteTime").innerHTML="©2021-"+nowYear+" PSONG ALL Rights Reserved";
+    document.getElementById("timeDate").innerHTML = " 本站已安全运行 " + dnum + " 天 ";
+    document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+}
+setInterval("createtime()", 250);
+</script>
+
+<!-- 添加网站运行时间》-->
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      桂ICP备20004780号
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        MathJax = {
+          tex    : {
+            inlineMath: { '[+]': [['$', '$']] }
+          },
+          loader : {
+            load: ['ui/lazy']
+          },
+          options: {
+            renderActions: {
+              findScript    : [10, doc => {
+                document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                  const display = !!node.type.match(/; *mode=display/);
+                  const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                  const text = document.createTextNode('');
+                  node.parentNode.replaceChild(text, node);
+                  math.start = { node: text, delim: '', n: 0 };
+                  math.end = { node: text, delim: '', n: 0 };
+                  doc.math.push(math);
+                });
+              }, '', false],
+              insertedScript: [200, () => {
+                document.querySelectorAll('mjx-container').forEach(node => {
+                  let target = node.parentNode;
+                  if (target.nodeName.toLowerCase() === 'li') {
+                    target.parentNode.classList.add('has-jax');
+                  }
+                });
+              }, '', false]
+            }
+          }
+        };
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.0/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

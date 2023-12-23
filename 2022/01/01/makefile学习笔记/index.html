@@ -1,0 +1,1030 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hps">
+  <meta name="keywords" content="青春|技术">
+  
+    <meta name="description" content="Makefile是一种工程管理文件，其定义了一系列的规则来指定哪些文件需要先编译，哪些文件需要后编译，哪些文件需要重新编译，甚至于进行更复杂的功能操作，在C&#x2F;C++项目中较为常见。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Makefile学习笔记">
+<meta property="og:url" content="http://1291945816.github.io/2022/01/01/makefile%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="pSomng&#39;s blog">
+<meta property="og:description" content="Makefile是一种工程管理文件，其定义了一系列的规则来指定哪些文件需要先编译，哪些文件需要后编译，哪些文件需要重新编译，甚至于进行更复杂的功能操作，在C&#x2F;C++项目中较为常见。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://1291945816.github.io/img/makefile_note.png">
+<meta property="article:published_time" content="2022-01-01T18:41:54.000Z">
+<meta property="article:modified_time" content="2023-12-23T05:06:34.000Z">
+<meta property="article:author" content="Hps">
+<meta property="article:tag" content="Makefile">
+<meta property="article:tag" content="工程项目管理">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://1291945816.github.io/img/makefile_note.png">
+  
+  
+  
+  <title>Makefile学习笔记 - pSomng&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1291945816.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"N6Yv4jtmqdE8UlvY3sF47iku-MdYXbMMI","app_key":"YEW5UmNoyIuo9iD5knjfctWf","server_url":null,"path":"window.location.pathname","ignore_local":true}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="pSomng's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pSomng&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/comment/">
+                <i class="iconfont icon-bookmark-fill"></i>
+                留言板
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Makefile学习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-01-01 18:41" pubdate>
+          2022/01/01 18:41
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Makefile学习笔记</h1>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>Makefile是一种工程管理文件，其定义了一系列的规则来指定哪些文件需要先编译，哪些文件需要后编译，哪些文件需要重新编译，甚至于进行更复杂的功能操作，在C/C++项目中较为常见。</p>
+</blockquote>
+<span id="more"></span>
+<h3 id="一、Makefile介绍"><a href="#一、Makefile介绍" class="headerlink" title="一、Makefile介绍"></a>一、Makefile介绍</h3><p>make命令执行时，需要一个Makefile文件，以告诉make命令需要怎么样去编译和链接程序。</p>
+<h4 id="1-1-规则"><a href="#1-1-规则" class="headerlink" title="1.1 规则"></a>1.1 规则</h4><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs makefile">target ... : prerequisites ...<br>    command<br>    ...<br>    ...<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>target</code>: 可以是一个<code>object file</code>(目标文件)、执行文件或标签。</li>
+<li><code>prerequisites</code>:生成该<code>target</code>所依赖的文件和<code>/</code>或 <code>target</code></li>
+<li><code>comm1and</code>:该<code>target</code>要执行的命令(任意的<code>shell</code>命令)</li>
+</ul>
+<p><strong>这表示一个文件的依赖关系，即<code>target</code>这一个或多个的目标文件依赖于<code>prerequisites</code>中的文件，其生成规则定义在<code>command</code>中</strong></p>
+<blockquote>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmake">prerequisites中如果有一个以上的文件比<span class="hljs-keyword">target</span>文件要新的话，<span class="hljs-keyword">command</span>所定义的命令就会被执行。<br></code></pre></td></tr></table></figure>
+</blockquote>
+<h4 id="1-2-make工作"><a href="#1-2-make工作" class="headerlink" title="1.2 make工作"></a>1.2 make工作</h4><ul>
+<li>make在当前目录寻找名字叫<code>makefile</code>或<code>Makefile</code>的文件。</li>
+<li>如果找到，首先找第一个目标文件，并将其当作最终的目标文件。</li>
+<li>如果第一个目标文件不存在，或者依赖文件的修改时间比该目标文件新，则会执行后面定义的命令来生成该目标文件。</li>
+<li>如果所依赖的文件也不存在，那么会在当前文件找目标为依赖文件的依赖性，根据相应规则生成依赖文件。</li>
+</ul>
+<p>显然，体现一个层级寻找生成的过程。其中一环出现错误，make会不工作，并爆出相关异常。</p>
+<h4 id="1-3-Makefile中使用变量"><a href="#1-3-Makefile中使用变量" class="headerlink" title="1.3 Makefile中使用变量"></a>1.3 Makefile中使用变量</h4><p>声明一个变量</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile">objects = main.o kbd.o command.o display.o \<br>     insert.o search.o files.o utils.o<br></code></pre></td></tr></table></figure>
+<p><code>objects</code>为变量名，采用<code>$(objects)</code>进行引用</p>
+<h4 id="1-4-Makefile自动推导"><a href="#1-4-Makefile自动推导" class="headerlink" title="1.4 Makefile自动推导"></a>1.4 Makefile自动推导</h4><p>make可以自动推导文件以及文件依赖关系后面的命令，故无需在每一个<code>.o</code>文件上都写上类似的命令。</p>
+<p>只要make看到一个<code>.o</code>文件，它就会自动把<code>.c</code>文件加到依赖关系中，比如如果make找到一个<code>whatever.o</code>，那么<code>whatever.c</code>就会是<code>whatever.o</code>的依赖文件。并且<code>cc -c whatever.c</code>也会被推导出来。</p>
+<p>在Makefile文件中使用<code>.PHONY</code>表示依赖是伪目标文件</p>
+<h4 id="1-5-Makefile的主要内容"><a href="#1-5-Makefile的主要内容" class="headerlink" title="1.5 Makefile的主要内容"></a>1.5 Makefile的主要内容</h4><ul>
+<li>显示规则: 要生成的文件、文件的依赖文件、生成命令。</li>
+<li>隐晦规则。</li>
+<li>变量的定义</li>
+<li>文件指示。<ul>
+<li>引用另外一个Makefile文件<ul>
+<li>采用<code>include &lt;filename&gt;</code>进行引入，<code>filename</code>可以是当前操作系统Shell的文件模式，即可以包含路径和通配符。<code>include</code>前面可以有一些空字符，但是不能够从<code>Tab</code>键开始。</li>
+</ul>
+</li>
+<li>根据某些情况制定Makefile的有效部分。</li>
+<li>定义一个多行命令</li>
+</ul>
+</li>
+<li>注释：注释采用<code>#</code></li>
+</ul>
+<p><strong>Makefile中的命令需要以Tab键开始</strong></p>
+<h3 id="二、书写规则"><a href="#二、书写规则" class="headerlink" title="二、书写规则"></a>二、书写规则</h3><h4 id="2-1-在规则中使用通配符"><a href="#2-1-在规则中使用通配符" class="headerlink" title="2.1 在规则中使用通配符"></a>2.1 在规则中使用通配符</h4><p>支持<code>~</code>、<code>?</code>、<code>*</code>通配符。</p>
+<ul>
+<li><code>~</code>：一般表示当前用户的用户目录。</li>
+<li><code>*</code>：一般表示匹配所有的意思。</li>
+<li><code>?</code>：一般表示单个字符</li>
+</ul>
+<p><strong>想要在变量中展开通配符的写法</strong></p>
+<p><code>objects := $(wildcard *.o)</code></p>
+<h4 id="2-2-文件搜寻"><a href="#2-2-文件搜寻" class="headerlink" title="2.2 文件搜寻"></a>2.2 文件搜寻</h4><p>采用特殊变量<code>VPATH</code></p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs makefile">VPATH = src:../headers<br></code></pre></td></tr></table></figure>
+<p>目录由冒号分隔。</p>
+<p>也可以采用make中的<code>vpath</code>命令。</p>
+<h4 id="2-3-伪目标"><a href="#2-3-伪目标" class="headerlink" title="2.3 伪目标"></a>2.3 伪目标</h4><p>“伪目标”不是一个文件，而是一个标签。<strong>不能够与文件名重名</strong></p>
+<p>可以采用<code>.PHONY</code>进行显式地指明一个目标是“伪目标”。</p>
+<h4 id="2-4-静态模式"><a href="#2-4-静态模式" class="headerlink" title="2.4 静态模式"></a>2.4 静态模式</h4><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs makefile">&lt;targets ...&gt; : &lt;target-pattern&gt; : &lt;prereq-patterns ...&gt;<br>    &lt;commands&gt;<br>    ...<br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>targets</code>:定义了一系列的目标文件，即目标的集合</li>
+<li><code>target-pattern</code>：指明了targets的模式，即目标集的模式。</li>
+<li><code>prereq-patterns</code>:是目标的依赖模式，对<code>target-pattern</code>形成的模式再进行一次依赖目标的定义。</li>
+</ul>
+<p>即 若<code>&lt;target-pattern&gt;</code>定义成<code>%.o</code>,表示我们的<code>target</code>都是以<code>.o</code>结尾的。而如果<code>prereq-pattern</code>定义成<code>%.c</code>意思是对<code>target-pattern</code>所形成的目标集进行二次定义，其计算方式是取<code>target-pattern</code>模式中的<code>%</code>，并为其加上<code>.c</code>这个结尾，形成新的集合。</p>
+<p><strong>该方式能够更方便的生成多目标文件</strong></p>
+<h4 id="2-5-自动生成依赖性"><a href="#2-5-自动生成依赖性" class="headerlink" title="2.5 自动生成依赖性"></a>2.5 自动生成依赖性</h4><p>现有的C/C++编译器都支持一个”-M”的选项，能够<strong>自动找寻源文件包含的头文件，并生成一个依赖关系</strong>。</p>
+<p>GNU组织建议通过把编译器为每一个源文件的自动生成的依赖关系放到一个文件中，为每一个<code>name.c</code>的文件都生成一个<code>name.d</code>的Makefile文件，<code>.d</code>文件中就存放对应<code>.c</code>文件的依赖关系。</p>
+<h3 id="三、书写命令"><a href="#三、书写命令" class="headerlink" title="三、书写命令"></a>三、书写命令</h3><p>每条规则中的命令和操作系统Shell的命令行是一致的，make会一按顺序一条条的执行命令，每条命令的开头必须以<code>Tab</code>键开头，除非是跟在依赖规则后面的分号后。</p>
+<h4 id="3-1-显示命令"><a href="#3-1-显示命令" class="headerlink" title="3.1 显示命令"></a>3.1 显示命令</h4><p><code>@</code>字符在命令行前，该命令不会被make显示出来，即会执行，不会输出相关命令。</p>
+<h4 id="3-2-命令执行"><a href="#3-2-命令执行" class="headerlink" title="3.2 命令执行"></a>3.2 命令执行</h4><p>当依赖目标新于目标是时，make会一条一条执行气候的命令，若<strong>想要上一条命令的结果应用在下一条命令时，需采用分号分隔这两条命令</strong>。</p>
+<p>要想忽略命令的出错，可以采用<code>-</code>(在Tab键之后)</p>
+<h4 id="3-3-嵌套执行make"><a href="#3-3-嵌套执行make" class="headerlink" title="3.3 嵌套执行make"></a>3.3 嵌套执行make</h4><p>假设有一个子目录叫<code>subdir</code>，这个目录下有个<code>Makefile</code>文件，来指明了这个目录下文件的编译规则。总控的Makefile可以这样书写:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">subsystem:</span><br>    cd subdir &amp;&amp; <span class="hljs-variable">$(MAKE)</span><br></code></pre></td></tr></table></figure>
+<p>其等价于：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">subsystem:</span><br>    <span class="hljs-variable">$(MAKE)</span> -C subdir<br></code></pre></td></tr></table></figure>
+<p><strong>传递变量到下级Makefile</strong></p>
+<p><code>export &lt;variable ...&gt;;</code></p>
+<p><strong>不想某些变量传递到下级</strong></p>
+<p><code>unexport &lt;variable ...&gt;;</code></p>
+<p><code>SHELL</code>、<code>MAKEFLAGS</code>这两个不管是否<code>export</code>总是需要传递到下层的Makefile中去的。</p>
+<p><code>MAKEFLAGS</code>变量，其中包含了 <code>make</code>的参数信息。若<strong>执行总控Makefile时有make参数或是在上层Makefile中定义了这个变量，那么该变量将会是这些参数，并会传递到下层Makefile中</strong></p>
+<h4 id="3-4-定义命令包"><a href="#3-4-定义命令包" class="headerlink" title="3.4 定义命令包"></a>3.4 定义命令包</h4><p>定义这种命令序列的语法以<code>define</code>开始，以<code>endef</code>结束。</p>
+<p>注意:<strong>不要与Makefile中的变量重名</strong></p>
+<h3 id="四、使用变量"><a href="#四、使用变量" class="headerlink" title="四、使用变量"></a>四、使用变量</h3><p>变量可以在“目标”、“依赖目标”、“命令”或是Makefile的其他部分中。</p>
+<p>变量的命名字可以包含字符、数字，下划线（可以是数字开头），但不应该含有 <code>:</code> 、 <code>#</code> 、 <code>=</code> 或是空字符（空格、回车等）；</p>
+<h4 id="4-1-变量相关注意点以及用法"><a href="#4-1-变量相关注意点以及用法" class="headerlink" title="4.1 变量相关注意点以及用法"></a>4.1 变量相关注意点以及用法</h4><ul>
+<li><p>声明时需要赋初值。使用时需要在变量名前使用<code>$</code>，并推荐采用小括号<code>()</code>或<code>&#123;&#125;</code>把变量包括起来。</p>
+</li>
+<li><p>为了避免变量的递归调用，可以采用<code>:=</code>,该方式表示前面的变量不能够使用后面的变量。</p>
+</li>
+<li><p>如果想要定义一个变量其值为空格，可以采用如下方式：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile">nullstring :=<br>space :=<span class="hljs-variable">$(nullstring)</span> <span class="hljs-comment">#end of the line</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p><code>?=</code>操作符表示变量如果没有被定义，则定义，否则什么也不做。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile">FOO ?= bar <span class="hljs-comment"># 表示如果FOO没有被定义过，则定义其值为bar，否则什么也不做。</span><br><br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="4-2-变量的高级用法"><a href="#4-2-变量的高级用法" class="headerlink" title="4.2 变量的高级用法"></a>4.2 变量的高级用法</h4><ul>
+<li><p>变量替换</p>
+<ul>
+<li>格式<code>$(var:a=b)</code>或<code>$&#123;var:a=b&#125;</code>，表示把变量”var”中所有以”a”字串结尾替换成”b”字串。</li>
+</ul>
+</li>
+<li><p>把变量的值再当做变量。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs makefile">x=y<br>y=z<br>a := $(<span class="hljs-variable">$(x)</span>) <span class="hljs-comment"># $(a)= z</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>可以使用多个变量来组成一个变量的名字，然后取值。</p>
+  <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-comment">#示例</span><br>first_second = Hello<br>a = first<br>b = second<br>all = $($a_$b)<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="4-3-追加变量值"><a href="#4-3-追加变量值" class="headerlink" title="4.3 追加变量值"></a>4.3 追加变量值</h4><p>采用<code>+=</code>操作符相当于给变量追加值。如果变量没有被定义过，则会自动变成<code>=</code>（这个不用担心会发生递归）,如果之前有定义，则会继承于前次操作的赋值符。</p>
+<h4 id="4-4-多行变量"><a href="#4-4-多行变量" class="headerlink" title="4.4 多行变量"></a>4.4 多行变量</h4><p>采用<code>define</code>和<code>endef</code>进行定义，<code>define</code>后面跟的是变量的名字，而重起一行定义变量的值。注意:<strong>命令需要以TAB键起头</strong></p>
+<h4 id="4-5-环境变量"><a href="#4-5-环境变量" class="headerlink" title="4.5 环境变量"></a>4.5 环境变量</h4><p>如果Makefile中定义了与环境变量相同的变量，那么系统的环境变量的值会被覆盖。</p>
+<h4 id="4-6-目标变量"><a href="#4-6-目标变量" class="headerlink" title="4.6 目标变量"></a>4.6 目标变量</h4><p>在Makefile中定义的变量都是“全局变量”，”自动化变量”如<code>$&lt;</code>属于规则型变量，这种变量的值依赖于规则的目标和依赖目标的定义。</p>
+<p>也可以为某个目标设置局部变量，这种变量被称为“Target-specific Variable”，它可以和“全局变量”同名，因为它的作用范围只在这条规则以及连带规则中，所以其值也只在作用范围内有效。而不会影响规则链以外的全局变量的值。</p>
+<p>语法:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs makefile">&lt;target ...&gt; : &lt;variable-assignment&gt;;<br><br>&lt;target ...&gt; : overide &lt;variable-assignment&gt;<br></code></pre></td></tr></table></figure>
+<p><code>&lt;variable-assignment&gt;</code>可以是前面讲过的各种赋值表达式，如 <code>=</code> 、 <code>:=</code> 、 <code>+=</code> 或是 <code>?=</code> 。第二个语法是针对于make命令行带入的变量，或是系统环境变量。</p>
+<h3 id="五、使用条件"><a href="#五、使用条件" class="headerlink" title="五、使用条件"></a>五、使用条件</h3><p><code>ifeq</code> 、 <code>else</code> 和 <code>endif</code> 。 </p>
+<ul>
+<li><code>ifeq</code> 的意思表示条件语句的开始，并指定一个条件表达式，表达式包含两个参数，以逗号分隔，表达式以圆括号括起。 </li>
+<li><code>else</code> 表示条件表达式为假的情况。 </li>
+<li><code>endif</code> 表示一个条件语句的结束，任何一个条件表达式都应该以 <code>endif</code> 结束。</li>
+</ul>
+<p>语法</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><br>&lt;conditional-directive&gt;<br>&lt;text-if-true&gt;<br><span class="hljs-keyword">endif</span><br>或<br>&lt;conditional-directive&gt;<br>&lt;text-if-true&gt;<br><span class="hljs-keyword">else</span><br>&lt;text-if-false&gt;<br><span class="hljs-keyword">endif</span><br><br><br></code></pre></td></tr></table></figure>
+<p><strong>四个关键字</strong></p>
+<ul>
+<li><p><code>ifeq</code>: 比较参数 <code>arg1</code> 和 <code>arg2</code> 的值是否相同。当然，参数中我们还可以使用make的函数。</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs perl">ife<span class="hljs-string">q (&lt;arg1&gt;, &lt;arg2&gt;)</span><br>ifeq <span class="hljs-string">&#x27;&lt;arg1&gt;&#x27;</span> <span class="hljs-string">&#x27;&lt;arg2&gt;&#x27;</span><br>ifeq <span class="hljs-string">&quot;&lt;arg1&gt;&quot;</span> <span class="hljs-string">&quot;&lt;arg2&gt;&quot;</span><br>ifeq <span class="hljs-string">&quot;&lt;arg1&gt;&quot;</span> <span class="hljs-string">&#x27;&lt;arg2&gt;&#x27;</span><br>ifeq <span class="hljs-string">&#x27;&lt;arg1&gt;&#x27;</span> <span class="hljs-string">&quot;&lt;arg2&gt;&quot;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p><code>ifneq</code>： 其比较参数 <code>arg1</code> 和 <code>arg2</code> 的值是否相同，如果不同，则为真。和 <code>ifeq</code> 类似。</p>
+</li>
+<li><p><code>ifdef</code>: 如果变量 <code>&lt;variable-name&gt;</code> 的值非空，那到表达式为真。否则，表达式为假。当然， <code>&lt;variable-name&gt;</code> 同样可以是一个函数的返回值。注意， <code>ifdef</code> 只是测试一个变量是否有值，其并不会把变量扩展到当前位置。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-keyword">ifdef</span> &lt;variable-name&gt;<br>bar =<br>foo = <span class="hljs-variable">$(bar)</span><br><span class="hljs-keyword">ifdef</span> foo<br>    frobozz = yes<br><span class="hljs-keyword">else</span><br>    frobozz = no<br><span class="hljs-keyword">endif</span><br><br><span class="hljs-comment"># $(frobozz) 为yes</span><br>foo =<br><span class="hljs-keyword">ifdef</span> foo<br>    frobozz = yes<br><span class="hljs-keyword">else</span><br>    frobozz = no<br><span class="hljs-keyword">endif</span><br><span class="hljs-comment"># $(frobozz) 为no</span><br><br></code></pre></td></tr></table></figure>
+</li>
+<li><p><code>ifndef</code>:和 <code>ifdef</code> 是相反的意思。</p>
+</li>
+</ul>
+<p>注意:<strong>在 <code>&lt;conditional-directive&gt;</code> 这一行上，多余的空格是被允许的，但是不能以 <code>Tab</code> 键作为开始（不然就被认为是命令）。而注释符 <code>#</code> 同样也是安全的。 <code>else</code> 和 <code>endif</code> 也一样，只要不是以 <code>Tab</code> 键开始就行了,最好不要把自动化变量（如 <code>$@</code> 等）放入条件表达式中，因为自动化变量是在运行时才有的。。</strong></p>
+<h3 id="六、使用函数"><a href="#六、使用函数" class="headerlink" title="六、使用函数"></a>六、使用函数</h3><p><strong>函数调用语法</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash">(&lt;<span class="hljs-keyword">function</span>&gt; &lt;arguments&gt;) or <span class="hljs-variable">$&#123;&lt;function&gt; &lt;arguments&gt;&#125;</span></span><br></code></pre></td></tr></table></figure>
+<p><code>&lt;function&gt;</code> 就是函数名，make支持的函数不多。 <code>&lt;arguments&gt;</code> 为函数的参数，参数间以逗号 <code>,</code> 分隔，而函数名和参数之间以“空格”分隔.函数调用以 <code>$</code> 开头，以圆括号或花括号把函数名和参数括起.函数和变量的括号最好一样，如使用 <code>$(subst a,b,$(x))</code> 这样的形式，而不是 <code>$(subst a,b, $&#123;x&#125;)</code> 的形式。因为统一会更清楚，也会减少一些不必要的麻烦。</p>
+<h3 id="七、make的运行"><a href="#七、make的运行" class="headerlink" title="七、make的运行"></a>七、make的运行</h3><p>通常来说，make的最终目标是Makefile中的第一个目标，而其他目标一般是由这个目标连带出来的。<strong>要想指定目标，需在make命令后直接跟目标的名字就可以完成</strong></p>
+<p><code>MAKECMDGOALS</code>存放你所指定的终极目标的列表。若在命令行上，没有指定目标，其值则为空值。</p>
+<h3 id="八、隐含规则"><a href="#八、隐含规则" class="headerlink" title="八、隐含规则"></a>八、隐含规则</h3><h4 id="8-1-模式规则"><a href="#8-1-模式规则" class="headerlink" title="8.1 模式规则"></a>8.1 模式规则</h4><p>目标中的<code>%</code>定义表示对文件名的匹配,<code>%</code>表示长度任意的非空字符串。</p>
+<p><strong>如果<code>%</code>定义在目标中，那么目标中的<code>%</code>的值决定了依赖目标中的<code>%</code>的值</strong></p>
+<h4 id="8-2-自动变量"><a href="#8-2-自动变量" class="headerlink" title="8.2 自动变量"></a>8.2 自动变量</h4><ul>
+<li><code>$@</code> : 表示规则中的目标文件集。在模式规则中，如果有多个目标，那么， <code>$@</code> 就是匹配于目标中模式定义的集合。</li>
+<li><code>$%</code> : 仅当目标是函数库文件中，表示规则中的目标成员名。例如，如果一个目标是 <code>foo.a(bar.o)</code> ，那么， <code>$%</code> 就是 <code>bar.o</code> ， <code>$@</code> 就是 <code>foo.a</code> 。如果目标不是函数库文件（Unix下是 <code>.a</code> ，Windows下是 <code>.lib</code> ），那么，其值为空。</li>
+<li><code>$&lt;</code> : 依赖目标中的第一个目标名字。如果依赖目标是以模式（即 <code>%</code> ）定义的，那么 <code>$&lt;</code> 将是符合模式的一系列的文件集。注意，其是一个一个取出来的。</li>
+<li><code>$?</code> : 所有比目标新的依赖目标的集合。以空格分隔。</li>
+<li><code>$^</code> : 所有的依赖目标的集合。以空格分隔。如果在依赖目标中有多个重复的，那么这个变量会去除重复的依赖目标，只保留一份。</li>
+<li><code>$+</code> : 这个变量很像 <code>$^</code> ，也是所有依赖目标的集合。只是它不去除重复的依赖目标。</li>
+<li><code>$*</code> : 这个变量表示目标模式中 <code>%</code> 及其之前的部分。如果目标是 <code>dir/a.foo.b</code> ，并且目标的模式是 <code>a.%.b</code> ，那么， <code>$*</code> 的值就是 <code>dir/a.foo</code> 。这个变量对于构造有关联的文件名是比较有较。如果目标中没有模式的定义，那么 <code>$*</code> 也就不能被推导出，但是，如果目标文件的后缀是make所识别的，那么 <code>$*</code> 就是除了后缀的那一部分。例如：如果目标是 <code>foo.c</code> ，因为 <code>.c</code> 是make所能识别的后缀名，所以， <code>$*</code> 的值就是 <code>foo</code> 。这个特性是GNU make的，很有可能不兼容于其它版本的make，所以，你应该尽量避免使用 <code>$*</code> ，除非是在隐含规则或是静态模式中。如果目标中的后缀是make所不能识别的，那么 <code>$*</code> 就是空值。</li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Makefile/">#Makefile</a>
+      
+        <a href="/tags/%E5%B7%A5%E7%A8%8B%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/">#工程项目管理</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Makefile学习笔记</div>
+      <div>http://1291945816.github.io/2022/01/01/makefile学习笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hps</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年1月1日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年12月23日</div>
+        </div>
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/01/05/%E4%B8%BA%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8B%E7%9A%84ubuntu-1804%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81ip/" title="为虚拟机下的ubuntu-1804配置静态ip">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">为虚拟机下的ubuntu-1804配置静态ip</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/10/%E5%9C%A8C%E4%B8%AD%E6%8C%87%E9%92%88%E7%9A%84%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7/" title="在C中指针的高级技巧">
+                        <span class="hidden-mobile">在C中指针的高级技巧</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.3.2/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.3.2/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comment-waline-qx71mhz0j-1291945816.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["mail"],"lang":"zh-CN","emoji":["https://unpkg.com/@waline/emojis@1.0.1/bilibili","https://unpkg.com/@waline/emojis@1.0.1/qq","https://unpkg.com/@waline/emojis@1.0.1/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love" style="color:red"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      <!-- 黄丕松增 -->
+      <!--《添加网站运行时间 -->
+<br/>
+
+<span id="bulidSiteTime">载入建站时间...</span>
+<br/>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+var now = new Date(); 
+
+function createtime() {
+    //此处修改你的建站时间或者网站上线时间
+    var grt = new Date('11/20/2021 21:00:00');
+    now.setTime(now.getTime() + 250);
+    days = (now - grt) / 1000 / 60 / 60 / 24;
+
+    dnum = Math.floor(days);
+    hours = (now - grt) / 1000 / 60 / 60 - (24 * dnum);
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+        hnum = "0" + hnum;
+    }
+    minutes = (now - grt) / 1000 / 60 - (24 * 60 * dnum) - (60 * hnum);
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+        mnum = "0" + mnum;
+    }
+    seconds = (now - grt) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+        snum = "0" + snum;
+    }
+    nowYear=now.getFullYear();
+    document.getElementById("bulidSiteTime").innerHTML="©2021-"+nowYear+" PSONG ALL Rights Reserved";
+    document.getElementById("timeDate").innerHTML = " 本站已安全运行 " + dnum + " 天 ";
+    document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+}
+setInterval("createtime()", 250);
+</script>
+
+<!-- 添加网站运行时间》-->
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      桂ICP备20004780号
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        MathJax = {
+          tex    : {
+            inlineMath: { '[+]': [['$', '$']] }
+          },
+          loader : {
+            load: ['ui/lazy']
+          },
+          options: {
+            renderActions: {
+              findScript    : [10, doc => {
+                document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                  const display = !!node.type.match(/; *mode=display/);
+                  const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                  const text = document.createTextNode('');
+                  node.parentNode.replaceChild(text, node);
+                  math.start = { node: text, delim: '', n: 0 };
+                  math.end = { node: text, delim: '', n: 0 };
+                  doc.math.push(math);
+                });
+              }, '', false],
+              insertedScript: [200, () => {
+                document.querySelectorAll('mjx-container').forEach(node => {
+                  let target = node.parentNode;
+                  if (target.nodeName.toLowerCase() === 'li') {
+                    target.parentNode.classList.add('has-jax');
+                  }
+                });
+              }, '', false]
+            }
+          }
+        };
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.0/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,924 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hps">
+  <meta name="keywords" content="青春|技术">
+  
+    <meta name="description" content="对于初学者来说，指针是比较头疼的东西，但是，如果你想深入了解底层的一些东西，指针你又是避不开的。既然逃避不了，干嘛不加入呢？一起继续探索指针中更高级更好玩的技巧吧！😄">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在C中指针的高级技巧">
+<meta property="og:url" content="http://1291945816.github.io/2021/12/10/%E5%9C%A8C%E4%B8%AD%E6%8C%87%E9%92%88%E7%9A%84%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:site_name" content="pSomng&#39;s blog">
+<meta property="og:description" content="对于初学者来说，指针是比较头疼的东西，但是，如果你想深入了解底层的一些东西，指针你又是避不开的。既然逃避不了，干嘛不加入呢？一起继续探索指针中更高级更好玩的技巧吧！😄">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://1291945816.github.io/img/c_point_advanced.png">
+<meta property="article:published_time" content="2021-12-10T13:54:31.000Z">
+<meta property="article:modified_time" content="2023-12-23T05:06:34.000Z">
+<meta property="article:author" content="Hps">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://1291945816.github.io/img/c_point_advanced.png">
+  
+  
+  
+  <title>在C中指针的高级技巧 - pSomng&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1291945816.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"N6Yv4jtmqdE8UlvY3sF47iku-MdYXbMMI","app_key":"YEW5UmNoyIuo9iD5knjfctWf","server_url":null,"path":"window.location.pathname","ignore_local":true}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="pSomng's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pSomng&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/comment/">
+                <i class="iconfont icon-bookmark-fill"></i>
+                留言板
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="在C中指针的高级技巧"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-12-10 13:54" pubdate>
+          2021/12/10 13:54
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">在C中指针的高级技巧</h1>
+            
+            <div class="markdown-body">
+              
+              <blockquote>
+<p>对于初学者来说，指针是比较头疼的东西，但是，如果你想深入了解底层的一些东西，指针你又是避不开的。既然逃避不了，干嘛不加入呢？一起继续探索指针中更高级更好玩的技巧吧！😄<span id="more"></span></p>
+</blockquote>
+<h3 id="1-回顾"><a href="#1-回顾" class="headerlink" title="1 回顾"></a>1 回顾</h3><p><strong>指针</strong>也指内存地址，<strong>指针变量</strong>是用来存放内存地址的变量，在32位的操作系统中，它的大小为4个字节，在64位的操作系统中则是8个字节，依次类推…</p>
+<p><strong>c语言中常见的指针变量定义</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**********************part one**********************/</span><br><span class="hljs-comment">//声明一个存储整型变量地址的指针</span><br><span class="hljs-keyword">int</span> *p; <br><br><span class="hljs-comment">//使用方式</span><br><span class="hljs-keyword">int</span> c;<br>p = &amp;c;<br><br><span class="hljs-comment">/**********************part two**********************/</span><br><span class="hljs-comment">//声明一个存储 指向整型变量的指针 的地址的指针 即指向指针的指针</span><br><span class="hljs-keyword">int</span> **pp; <br><span class="hljs-comment">//使用方式</span><br><span class="hljs-keyword">int</span> *p_1;<br>pp = &amp;p_1;<br><br><br><span class="hljs-comment">/**********************part three**********************/</span><br><span class="hljs-keyword">int</span> *p[]; <span class="hljs-comment">//声明一个数组，该数组存储的内容为整型变量地址即整型指针</span><br><br><span class="hljs-comment">//使用方式</span><br><span class="hljs-keyword">int</span> d;<br>p[<span class="hljs-number">0</span>] = &amp;d; <br><br> <span class="hljs-comment">/**********************part four**********************/</span><br><span class="hljs-keyword">int</span> (*p)[<span class="hljs-number">4</span>]; <span class="hljs-comment">//声明一个指针变量，指向的是数组 </span><br><br><span class="hljs-comment">//使用方式</span><br><span class="hljs-keyword">int</span> a[<span class="hljs-number">4</span>];<br>p = &amp;a;<br><br></code></pre></td></tr></table></figure>
+<h3 id="2-声明推断"><a href="#2-声明推断" class="headerlink" title="2 声明推断"></a>2 声明推断</h3><p>从回顾中，我们简单回顾了一些常见的指针用法，下面继续看看一些有意思的声明以及理解这个声明到底是什么意思。</p>
+<p>注意: <strong>用于声明变量的表达式和普通的表达式在求值时所使用的规则相同。</strong></p>
+<p><strong>示例一</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//一个整型变量</span><br><span class="hljs-keyword">int</span> i;<br><span class="hljs-comment">//一个指向整型的指针</span><br><span class="hljs-keyword">int</span> *i_p;<br></code></pre></td></tr></table></figure>
+<p>针对这个<code>*i_P</code>，可以理解成<strong>被声明为了一个整数</strong>,但它用<code>*</code>表示了这个表达式，所以可以理解成<strong>这是一个指针变量，它指向的地址存储的是整数</strong></p>
+<p><strong>示例二</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//声明一个函数原型</span><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">f</span><span class="hljs-params">()</span></span>;<br><span class="hljs-comment">//声明一个返回整型指针的函数原型</span><br><span class="hljs-function"><span class="hljs-keyword">int</span> *<span class="hljs-title">f</span><span class="hljs-params">()</span></span>;<br></code></pre></td></tr></table></figure>
+<p>对于表达式<code>*f()</code>，优先级最高的是<code>()</code>,所以声明时最先与<code>f</code>结合的是<code>()</code>，所以这是一个函数，既然知道了它是一个函数，那么剩下的部分就应该的是它的返回值类型了，所以可以理解成<strong>这是一个回整型指针的函数原型</strong></p>
+<p><strong>示例三</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//1.</span><br><span class="hljs-keyword">int</span> (*f)();<br><span class="hljs-comment">//2.</span><br><span class="hljs-keyword">int</span> *(*f)();<br></code></pre></td></tr></table></figure>
+<p>如果能够理解示例一与二的推断方式，那么针对这个示例应该是很容易理解。</p>
+<p>表达式<code>(*f)()</code>中由于括号优先级，可以看到<code>f</code>先与<code>*</code>结合，所以<code>f</code>是一个指针，接下来的是与第二个括号结合，说明这个指针指向的是一个函数，这个函数的返回值为整型。所以整体理解就是<strong>这是一个指向/返回整型的函数的/首地址的指针</strong>，即<strong>函数指针</strong></p>
+<p>表达式<code>*(*f)()</code>这个与<code>(*f)()</code>声明多了左边的<code>*</code>,也就是相当于函数的返回类型是整型指针，故可以理解为<strong>这是一个指向/返回整型指针的函数的/首地址的指针</strong></p>
+<p><strong>示例四</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//以下先省略数组长度</span><br><span class="hljs-comment">//1.</span><br><span class="hljs-keyword">int</span> * f[];<br><br><span class="hljs-comment">//错误示例</span><br><span class="hljs-comment">//2.</span><br><span class="hljs-keyword">int</span> f[]();<br><span class="hljs-comment">//3.</span><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">f</span><span class="hljs-params">()</span>[]</span>;<br></code></pre></td></tr></table></figure>
+<p>下面序号1、2、3分别代码中的三个声明：</p>
+<ol>
+<li>表达式<code>*f[]</code>中优先级最高的是<code>[]</code>，所以这个是一个数组，数组元素存储的是整型指针。</li>
+<li>表达式<code>f[]()</code>中的<code>f</code>先与<code>[]</code>结合，所以它是一个数组，然后它的是元素类型是函数，这是错的!，对于一个函数来说，不同的函数长度是不一样的，然而对于数组来说，要求是一样的，所以这个声明无法成立。</li>
+<li><code>f()[]</code>中的<code>f</code>先与<code>()</code>结合，所以它是一个函数，那么它的返回值就是数组，然而函数中不能够返回数组，所以这个声明也是错的。</li>
+</ol>
+<p><strong>示例五</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">int</span> *(*f[])();<br></code></pre></td></tr></table></figure>
+<p>这个声明表达式阅读起来确实有点困难！但是依然可以用上面的拆解方式进行解读。<code>*(*f[])()</code>是由<code>*</code>,<code>(*f[])</code>,<code>()</code>组成，显然<code>(*f[])</code>优先级更高，所以根据这个括号的内容知道这个<code>f</code>一定是一个数组，然后它应该存储的是xx类型的指针，要看是什么类型的指针，还得看外面，噢是<code>()</code>啊，那就是函数，所以它存储的内容是函数的指针。那么这个函数的返回值是什么呢?噢，左边是一个<code>*</code>，所以它是返回了一个整型的指针。</p>
+<blockquote>
+<p>分析这个表达式实在是头大的话，建议反复阅读这几个示例！</p>
+</blockquote>
+<p>注意，如果函数有参数的话，声明涉及到函数原型时最好注明参数类型，如:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">int</span> (*f)(<span class="hljs-keyword">int</span>,<span class="hljs-keyword">float</span>);<br><span class="hljs-keyword">int</span> *(*g[])(<span class="hljs-keyword">int</span>,<span class="hljs-keyword">float</span>);<br></code></pre></td></tr></table></figure>
+<h3 id="3-函数指针"><a href="#3-函数指针" class="headerlink" title="3 函数指针"></a>3 函数指针</h3><p>函数指针上面举例子的时候，已经被举例过了，它就是指向函数的指针变量。在c中，函数也会有存储空间的，也有对应的入口地址，函数名一般就是指向这个入口的地址。</p>
+<p><strong>函数指针的初始化与使用</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">f</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span></span>;<br><span class="hljs-keyword">int</span> (*pf)(<span class="hljs-keyword">int</span>) = &amp;f; <span class="hljs-comment">//这个&amp;是可选的，因为函数名被使用时总是由编译器把它转换为函数指针。</span><br><br><span class="hljs-keyword">int</span> ans;<br>ans = f(<span class="hljs-number">25</span>); <span class="hljs-comment">//函数名调用</span><br>ans = (*pf)(<span class="hljs-number">25</span>); <span class="hljs-comment">//间接访问得到一个函数名然后调用</span><br>ans = pf(<span class="hljs-number">25</span>); <span class="hljs-comment">//与第一个一样，间接访问非必须</span><br></code></pre></td></tr></table></figure>
+<h4 id="3-1-函数指针的应用场景一-回调函数"><a href="#3-1-函数指针的应用场景一-回调函数" class="headerlink" title="3.1 函数指针的应用场景一: 回调函数"></a>3.1 函数指针的应用场景一: 回调函数</h4><p>说起回调函数，其实在很多地方能够见到这个东西，比如点击按钮时，执行什么；发起一个<code>http</code>异步请求，处理响应结果时等等。</p>
+<p>回调函数往往时这样: 把一个函数作为参数传递给其他函数，后者将会”回调“该函数。</p>
+<p><strong>示例代码</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;error.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> DataType char</span><br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Node</span>&#123;</span><br>    DataType value;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Node</span> * <span class="hljs-title">next</span>;</span><br>&#125;;<br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Node</span>* <span class="hljs-title">LinkNode</span>;</span><br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Node</span>* <span class="hljs-title">LinkList</span>;</span><br><br><br><br><span class="hljs-function">LinkList <span class="hljs-title">creat_linklist</span><span class="hljs-params">()</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">add_element</span><span class="hljs-params">(LinkList <span class="hljs-built_in">list</span>,DataType value)</span></span>;<br><br><span class="hljs-comment">/************************************key point*****************************************************/</span><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">search_value</span><span class="hljs-params">(LinkList <span class="hljs-built_in">list</span>,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span>* value,<span class="hljs-keyword">int</span> (*compare)(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * ,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> *))</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">compare_self_impl</span><span class="hljs-params">(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op1,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op2)</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">compare_self_impl_char</span><span class="hljs-params">(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op1,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op2)</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br><br>    <span class="hljs-comment">//创建一个空链表</span><br>    LinkList <span class="hljs-built_in">list</span>=creat_linklist();<br>    add_element(<span class="hljs-built_in">list</span>,<span class="hljs-string">&#x27;a&#x27;</span>);<br>    add_element(<span class="hljs-built_in">list</span>,<span class="hljs-string">&#x27;b&#x27;</span>);<br>    add_element(<span class="hljs-built_in">list</span>,<span class="hljs-string">&#x27;d&#x27;</span>);<br>    <span class="hljs-keyword">char</span> c=<span class="hljs-string">&#x27;a&#x27;</span>;<br>    <span class="hljs-keyword">int</span> result = search_value(<span class="hljs-built_in">list</span>,&amp;c,compare_self_impl_char);<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d&quot;</span>, result);<br><br><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><br><span class="hljs-function">LinkList <span class="hljs-title">creat_linklist</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    LinkList <span class="hljs-built_in">list</span> = (LinkList) <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(struct Node));<br>    <span class="hljs-built_in">list</span>-&gt;next=<span class="hljs-literal">NULL</span>;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">list</span>;<br>&#125;<br><br><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">add_element</span><span class="hljs-params">(LinkList <span class="hljs-built_in">list</span>,DataType value)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span>(!<span class="hljs-built_in">list</span>)<br>        <span class="hljs-built_in">exit</span>(ERROR_INVALID_PARAMETER);<br>    LinkNode new_node = (LinkNode) <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(struct Node));<br>    new_node-&gt;next=<span class="hljs-built_in">list</span>-&gt;next;<br>    new_node-&gt;value=value;<br>    <span class="hljs-built_in">list</span>-&gt;next=new_node;<br>&#125;<br><br><br><span class="hljs-comment">/************************************key point*****************************************************/</span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">search_value</span><span class="hljs-params">(LinkList <span class="hljs-built_in">list</span>,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * value,<span class="hljs-keyword">int</span> (*compare)(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * ,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> *))</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">int</span> result = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span>(!<span class="hljs-built_in">list</span>)<br>        <span class="hljs-built_in">exit</span>(ERROR_INVALID_PARAMETER);<br>    LinkNode p = <span class="hljs-built_in">list</span>-&gt;next;<br>    <span class="hljs-keyword">while</span> (p)<br>    &#123;<br>        <span class="hljs-keyword">if</span>(compare(&amp;p-&gt;value,value) == <span class="hljs-number">1</span>)<br>        &#123;<br>            result = <span class="hljs-number">1</span>;<br>            <span class="hljs-keyword">break</span>;<br>        &#125;<br>        p=p-&gt;next;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> result;<br>&#125;<br><br><br><span class="hljs-comment">//实现自定义的比较函数 数字</span><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">compare_self_impl</span><span class="hljs-params">(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op1,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op2)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> *((<span class="hljs-keyword">int</span> *)op1) == *((<span class="hljs-keyword">int</span> *)op2) ? <span class="hljs-number">1</span>:<span class="hljs-number">0</span>;<br>&#125;<br><br><br><br><span class="hljs-comment">//实现自定义的比较函数 字符</span><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">compare_self_impl_char</span><span class="hljs-params">(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op1,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * op2)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> *((<span class="hljs-keyword">char</span> *)op1) == *((<span class="hljs-keyword">char</span> *)op2) ? <span class="hljs-number">1</span>:<span class="hljs-number">0</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p><code>search_value</code>函数用于查找某个值是否在链表中，它的内部必然涉及两个元素进行比较。如果我们的链表只针对某个特定的元素类型，那么它的实现就比较简单，直接内部进行取值比较就行了。但是如果想要更为通用，那么这个比较就不能在函数内部实现了（当然，你直接实现也可以，但是你得在内部进行判别类型）。这时候函数指针的用处就体现出来了，只需声明一个函数指针参数,其他元素类型只需重写这个比较函数，并提供函数地址，由<code>search_value</code>函数在内部调用即可。</p>
+<p><code>search_value</code>函数的原型如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">search_value</span><span class="hljs-params">(LinkList <span class="hljs-built_in">list</span>,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * value,<span class="hljs-keyword">int</span> (*compare)(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * ,<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> *))</span></span>;<br></code></pre></td></tr></table></figure>
+<p>不知道你是否注意到其中的<code>int (*compare)(void const * ,void const *)</code>参数类型？由于声明这个函数原型的时候，是不知道具体参与比较的元素的类型的，所以为了匹配所有元素，故将类型定为<code>void *</code>。到时候声明一个符合该函数指针要求的函数时，则需在内部进行强制类型转换即可，这时肯定能知道所需要比较的参数类型了。</p>
+<h4 id="3-2-函数指针的应用场景二：转移表"><a href="#3-2-函数指针的应用场景二：转移表" class="headerlink" title="3.2 函数指针的应用场景二：转移表"></a>3.2 函数指针的应用场景二：转移表</h4><p>假设，我们想要实现一个简单的<strong>加减乘除</strong>计算器，常见的实现方式:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">int</span> select_no,op1,op2,result;<br><span class="hljs-keyword">switch</span> (select_no) &#123;<br>    <span class="hljs-keyword">case</span> ADD:<br>    &#123;<br>        result= op1 + op2; <br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">case</span> SUB:<br>    &#123;<br>        result= op1 - op2;<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">case</span> MUL:<br>    &#123;<br>        result= op1 * op2;<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">case</span> DIV:<br>    &#123;<br>        result= op1 / op2; <span class="hljs-comment">//这里实现有点小瑕疵，但也很常见的</span><br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如果我们想再增加更多的功能模块的话，这个<code>switch</code>语句将会更长。如果想要达到良好的程序设计，建议把具体操作与选择操作分开，即<strong>加减乘除</strong>操作的实现与选择分开，所以推荐使用函数实现，以便于后期扩展。</p>
+<p>对于<code>switch</code>，需要知道的是: 表示操作符的分支必须是整数。所以我们可以想到，如果是从0开始的连续的整数，可以用数组来映射的，这就是转移表。所谓数组，就是存储函数指针的数组。</p>
+<p><strong>示例代码</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">self_add</span><span class="hljs-params">(<span class="hljs-keyword">double</span> a,<span class="hljs-keyword">double</span> b)</span></span>&#123; <span class="hljs-keyword">return</span> a+b;&#125;<br><span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">self_sub</span><span class="hljs-params">(<span class="hljs-keyword">double</span> a,<span class="hljs-keyword">double</span> b )</span></span>&#123;<span class="hljs-keyword">return</span> a-b;&#125;<br><span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">self_mul</span><span class="hljs-params">(<span class="hljs-keyword">double</span> a,<span class="hljs-keyword">double</span> b )</span></span>&#123;<span class="hljs-keyword">return</span> a*b;&#125;<br><span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">self_div</span><span class="hljs-params">(<span class="hljs-keyword">double</span> a,<span class="hljs-keyword">double</span> b )</span></span>&#123;<span class="hljs-keyword">return</span> a/b;&#125;<span class="hljs-comment">//这里实现有点小瑕疵</span><br><br><span class="hljs-comment">//定义一个函数指针数组，然后初始化</span><br><span class="hljs-keyword">double</span> (*oper_func[])(<span class="hljs-keyword">double</span> ,<span class="hljs-keyword">double</span> )=&#123;<br>        &amp;self_add, &amp;self_sub, &amp;self_mul, &amp;self_div<br>&#125;;<br><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">OP</span>&#123;</span>ADD=<span class="hljs-number">0</span>,SUB,MUL,DIV&#125;; <span class="hljs-comment">//定义 枚举</span><br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <br>    <span class="hljs-keyword">double</span> a=oper_func[ADD](<span class="hljs-number">3</span>,<span class="hljs-number">1</span>);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%lf&quot;</span>,a);<br>    <br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>这里需要主要注意的是：</p>
+<p><strong>既然用到了数组，就有可能发生越界行为，就可能会造成不可预料的结果，所以建议在使用需要保证在合理的范围内。</strong></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C-C/" class="category-chain-item">C/C++</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C-C/">#C/C++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>在C中指针的高级技巧</div>
+      <div>http://1291945816.github.io/2021/12/10/在C中指针的高级技巧/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hps</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年12月10日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年12月23日</div>
+        </div>
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/01/01/makefile%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Makefile学习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Makefile学习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/01/%E8%A7%A3%E5%86%B3Linux%E4%B8%8B%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91U-Boot%E6%BA%90%E7%A0%81%E6%97%B6%E6%8A%A5&#39;multiple%20definition%20of%20%60yylloc&#39;&#39;%E7%9A%84%E9%94%99%E8%AF%AF/" title="解决Linux下交叉编译U-Boot源码时报&#39;multiple definition of `yylloc&#39;&#39;的错误">
+                        <span class="hidden-mobile">解决Linux下交叉编译U-Boot源码时报&#39;multiple definition of `yylloc&#39;&#39;的错误</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.3.2/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.3.2/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comment-waline-qx71mhz0j-1291945816.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["mail"],"lang":"zh-CN","emoji":["https://unpkg.com/@waline/emojis@1.0.1/bilibili","https://unpkg.com/@waline/emojis@1.0.1/qq","https://unpkg.com/@waline/emojis@1.0.1/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love" style="color:red"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      <!-- 黄丕松增 -->
+      <!--《添加网站运行时间 -->
+<br/>
+
+<span id="bulidSiteTime">载入建站时间...</span>
+<br/>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+var now = new Date(); 
+
+function createtime() {
+    //此处修改你的建站时间或者网站上线时间
+    var grt = new Date('11/20/2021 21:00:00');
+    now.setTime(now.getTime() + 250);
+    days = (now - grt) / 1000 / 60 / 60 / 24;
+
+    dnum = Math.floor(days);
+    hours = (now - grt) / 1000 / 60 / 60 - (24 * dnum);
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+        hnum = "0" + hnum;
+    }
+    minutes = (now - grt) / 1000 / 60 - (24 * 60 * dnum) - (60 * hnum);
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+        mnum = "0" + mnum;
+    }
+    seconds = (now - grt) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+        snum = "0" + snum;
+    }
+    nowYear=now.getFullYear();
+    document.getElementById("bulidSiteTime").innerHTML="©2021-"+nowYear+" PSONG ALL Rights Reserved";
+    document.getElementById("timeDate").innerHTML = " 本站已安全运行 " + dnum + " 天 ";
+    document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+}
+setInterval("createtime()", 250);
+</script>
+
+<!-- 添加网站运行时间》-->
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      桂ICP备20004780号
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        MathJax = {
+          tex    : {
+            inlineMath: { '[+]': [['$', '$']] }
+          },
+          loader : {
+            load: ['ui/lazy']
+          },
+          options: {
+            renderActions: {
+              findScript    : [10, doc => {
+                document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                  const display = !!node.type.match(/; *mode=display/);
+                  const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                  const text = document.createTextNode('');
+                  node.parentNode.replaceChild(text, node);
+                  math.start = { node: text, delim: '', n: 0 };
+                  math.end = { node: text, delim: '', n: 0 };
+                  doc.math.push(math);
+                });
+              }, '', false],
+              insertedScript: [200, () => {
+                document.querySelectorAll('mjx-container').forEach(node => {
+                  let target = node.parentNode;
+                  if (target.nodeName.toLowerCase() === 'li') {
+                    target.parentNode.classList.add('has-jax');
+                  }
+                });
+              }, '', false]
+            }
+          }
+        };
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.0/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

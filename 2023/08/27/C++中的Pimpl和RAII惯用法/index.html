@@ -1,0 +1,942 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hps">
+  <meta name="keywords" content="青春|技术">
+  
+    <meta name="description" content="C++中的Pimpl、RAII是两种比较常见的编程技巧，之前学过几次，经常只知道名称，具体内容又忘记了，在这里简单做个学习记录。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++中的Pimpl和RAII惯用法">
+<meta property="og:url" content="http://1291945816.github.io/2023/08/27/C++%E4%B8%AD%E7%9A%84Pimpl%E5%92%8CRAII%E6%83%AF%E7%94%A8%E6%B3%95/index.html">
+<meta property="og:site_name" content="pSomng&#39;s blog">
+<meta property="og:description" content="C++中的Pimpl、RAII是两种比较常见的编程技巧，之前学过几次，经常只知道名称，具体内容又忘记了，在这里简单做个学习记录。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-27T08:53:25.000Z">
+<meta property="article:modified_time" content="2023-12-23T05:06:34.000Z">
+<meta property="article:author" content="Hps">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>C++中的Pimpl和RAII惯用法 - pSomng&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1291945816.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"N6Yv4jtmqdE8UlvY3sF47iku-MdYXbMMI","app_key":"YEW5UmNoyIuo9iD5knjfctWf","server_url":null,"path":"window.location.pathname","ignore_local":true}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="pSomng's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pSomng&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/comment/">
+                <i class="iconfont icon-bookmark-fill"></i>
+                留言板
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="C++中的Pimpl和RAII惯用法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-08-27 08:53" pubdate>
+          2023/08/27 08:53
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">C++中的Pimpl和RAII惯用法</h1>
+            
+            <div class="markdown-body">
+              
+              <div class="note note-primary">
+            <p>C++中的<code>Pimpl</code>、<code>RAII</code>是两种比较常见的编程技巧，之前学过几次，经常只知道名称，具体内容又忘记了，在这里简单做个学习记录。</p>
+          </div>
+<span id="more"></span>
+<h3 id="一、PImpl-惯用法"><a href="#一、PImpl-惯用法" class="headerlink" title="一、PImpl 惯用法"></a>一、PImpl 惯用法</h3><blockquote>
+<p>PImpl（<strong>P</strong>ointer to <strong>impl</strong>ementation）是一种比较常见的C++编程技巧，采用这种技巧能够减少代码依赖以及编译时间，具体思想是：<u>将类的实现细节（如一些非虚的私有成员）从对象的表示中移除，放到另外的一个类中，并以一个指针（建议是一个独享的指针，如<code>unique_ptr</code>）指向它进行访问。</u></p>
+</blockquote>
+<h4 id="1-1-Pimpl出现的背景？原因？"><a href="#1-1-Pimpl出现的背景？原因？" class="headerlink" title="1.1 Pimpl出现的背景？原因？"></a>1.1 Pimpl出现的背景？原因？</h4><p>在C++中，当头文件中的类定义发生变化，该类所有被使用的地方都<strong>需要重新被编译</strong>，<strong>甚至于更改的地方仅仅是外部无法访问的私有成员数据</strong>，主要原因在于私有成员数据在以下两个方面会影响一个类：</p>
+<ul>
+<li><strong>大小和布局</strong>：代码调用者需要知道类的大小和布局（这会包括私有数据成员），换句话说，它始终要能够看到实现，这种约束会导致调用者和被调用者之间存在更紧密的耦合性。当然这是C++对象模型和哲学的核心，因为需要保证编译器默认情况下可以直接访问对象是使C++实现其著名的高度优化效率的要素。</li>
+<li><strong>函数</strong>：类的私有成员函数也会参与重载决议。</li>
+</ul>
+<p>为了减少这写编译依赖，一般会<strong>采用指针来隐藏一些实现细节</strong>，在C++11中，可以采用如下的<code>Pimpl</code>惯用法写法：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;memory&gt;</span></span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span>&#123;</span><br>  <span class="hljs-comment">//一些其他需要放在该处的内容，如虚函数什么的</span><br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Impl</span>;</span> <span class="hljs-comment">// 细节类的前向声明</span><br>    <span class="hljs-comment">// 采用unique_ptr 是因为Impl的所有权是A对象所独占的，采用该指针包装器可以更好地表达这一意思</span><br>    std::unique_ptr&lt;Impl&gt; impl_ptr; <span class="hljs-comment">// 指向具体的实现</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>需要提到的是，提到<code>Pimpl</code>惯用法，一般也会提到“<strong>编译防火墙</strong>”。</p>
+<blockquote>
+<p>被称作编译防火墙的原因在于，<u>采用这种技巧能够很好地避免由于更改部分成员而导致编译级联（多处源文件重新编译）</u>。有一个例外，如果实现类是类模板特化，那么就会丧失编译防火墙的优势：接口的用户必须观测到整个模板定义，以实例化正确的特化。</p>
+</blockquote>
+<p>总的来说，它可带来两个很明显的好处：</p>
+<ul>
+<li>编译防火墙，打破编译依赖，省时</li>
+<li>隐藏实现细节，即接口与实现分离</li>
+</ul>
+<h4 id="1-2-C-11中Pimpl惯用法的最佳实践"><a href="#1-2-C-11中Pimpl惯用法的最佳实践" class="headerlink" title="1.2 C++11中Pimpl惯用法的最佳实践"></a>1.2 C++11中Pimpl惯用法的最佳实践</h4><p>前面提到，在C++11及以后的标准，应该尽量避免采用原生的指针（这也是贯彻了<code>RAII</code>的思想）。</p>
+<p>以下面的代码为例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">/*在头文件中*/</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Widget</span>&#123;</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">Widget</span>();<br>    ~<span class="hljs-built_in">Widget</span>();<br>    <br>    <span class="hljs-built_in">Widget</span>(Widget &amp;&amp;) <span class="hljs-keyword">noexcept</span> ;<br>    Widget&amp; <span class="hljs-keyword">operator</span>= (Widget &amp;&amp;)   <span class="hljs-keyword">noexcept</span> ;<br><br><br>    <span class="hljs-built_in">Widget</span>(<span class="hljs-keyword">const</span> Widget &amp;) =<span class="hljs-keyword">delete</span>;        <span class="hljs-comment">// 拷贝构造 定义为删除的</span><br>    Widget&amp; <span class="hljs-keyword">operator</span>=(<span class="hljs-keyword">const</span> Widget&amp;) = <span class="hljs-keyword">delete</span>; <span class="hljs-comment">// 复制拷贝 定义为删除的</span><br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Impl</span>;</span><br>    std::unique_ptr&lt;Impl&gt; impl_ptr;<br>    <br>&#125;<br><br><br><span class="hljs-comment">/*在实现的源文件中*/</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Widget</span>:</span>:Impl&#123;<br>    <span class="hljs-keyword">int</span> n;<br>    <span class="hljs-comment">// 一些细节</span><br>&#125;;<br><br><span class="hljs-comment">// 须在外面进行定义 确保Impl 是完整类型</span><br>Widget::<span class="hljs-built_in">Widget</span>(<span class="hljs-keyword">int</span> n):<span class="hljs-built_in">impl_ptr</span>(std::make_unique&lt;Impl&gt;(n))&#123;<br>&#125;<br><br>Widget::<span class="hljs-built_in">Widget</span>(Widget &amp;&amp;)  <span class="hljs-keyword">noexcept</span> = <span class="hljs-keyword">default</span>;<br>Widget &amp;Widget::<span class="hljs-keyword">operator</span>=(Widget &amp;&amp;)  <span class="hljs-keyword">noexcept</span> = <span class="hljs-keyword">default</span>;<br>Widget::~<span class="hljs-built_in">Widget</span>()=<span class="hljs-keyword">default</span>;<br></code></pre></td></tr></table></figure>
+<p>在这个例子中，其实也就是这套<code>Pimpl</code>模板中：</p>
+<ul>
+<li>采用<code>unique_ptr</code>是<u>为了准确表达<code>Widget</code>对象对<code>Impl</code>对象的所有权是独占的，而不是共享的</u></li>
+<li>由于<code>unique_ptr</code>要求指向的类型在任何实例化删除器的语境中均为完整类型，故特殊成员函数需要用户声明且需在<code>Impl</code>定义后定义</li>
+<li>构造函数也需要在类外定义并且分配<code>Pimpl</code>对象资源</li>
+<li>由于用户自定义了析构函数，所以编译不会生成可移动构造函数和移动赋值运算符（赋值同样），这就需要用户根据需求决定是否提供</li>
+</ul>
+<blockquote>
+<p>额外提一点，<strong>建议将所有<u>私有非虚成员</u>移动到具体的实现类中</strong>，虚函数需要在继承链中可见，故不建议在<code>Pimpl</code>惯用法将其移动到实现类中。</p>
+</blockquote>
+<h4 id="1-3-一个具体的例子"><a href="#1-3-一个具体的例子" class="headerlink" title="1.3 一个具体的例子"></a>1.3 一个具体的例子</h4><p><strong>Widget.h</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs c++"><br><span class="hljs-comment">/********************************************************************************</span><br><span class="hljs-comment">* @author: Huang Pisong</span><br><span class="hljs-comment">* @email: huangpisong@foxmail.com</span><br><span class="hljs-comment">* @date: 2023/8/25 20:48</span><br><span class="hljs-comment">* @version: 1.0</span><br><span class="hljs-comment">* @description: </span><br><span class="hljs-comment">********************************************************************************/</span><br><br><span class="hljs-meta">#<span class="hljs-meta-keyword">ifndef</span> TEST_CPP_WORK1_WIDGET_H</span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> TEST_CPP_WORK1_WIDGET_H</span><br><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;memory&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;experimental/propagate_const&gt;</span></span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Widget</span> &#123;</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">draw</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">draw</span><span class="hljs-params">()</span> </span>;<br>    <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">shown</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span> </span>&#123;<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Widget</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span></span>;<br><br><br>    <span class="hljs-built_in">Widget</span>(Widget &amp;&amp;) <span class="hljs-keyword">noexcept</span> ;<br>    Widget&amp; <span class="hljs-keyword">operator</span>= (Widget &amp;&amp;)   <span class="hljs-keyword">noexcept</span> ;<br><br>    <span class="hljs-built_in">Widget</span>(<span class="hljs-keyword">const</span> Widget &amp;) =<span class="hljs-keyword">delete</span>;<br>    Widget&amp; <span class="hljs-keyword">operator</span>=(<span class="hljs-keyword">const</span> Widget&amp;) = <span class="hljs-keyword">delete</span>;<br>    <br>    ~<span class="hljs-built_in">Widget</span>();<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Impl</span>;</span>  <span class="hljs-comment">// 前置声明</span><br>    <span class="hljs-comment">/*propagate_const  会传递const从而保证调用的指针是一致的*/</span><br>    std::experimental::propagate_const&lt;std::unique_ptr&lt;Impl&gt;&gt; impl_ptr;  <span class="hljs-comment">// 指向实现类的指针</span><br><br>&#125;;<br><span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span> <span class="hljs-comment">//TEST_CPP_WORK1_WIDGET_H</span></span><br><br></code></pre></td></tr></table></figure>
+<p><strong>Widget.cpp</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs c++"><br><span class="hljs-comment">/********************************************************************************</span><br><span class="hljs-comment">* @author: Huang Pisong</span><br><span class="hljs-comment">* @email: huangpisong@foxmail.com</span><br><span class="hljs-comment">* @date: 2023/8/25 20:48</span><br><span class="hljs-comment">* @version: 1.0</span><br><span class="hljs-comment">* @description: </span><br><span class="hljs-comment">********************************************************************************/</span><br><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&quot;Widget.h&quot;</span></span><br><br><span class="hljs-comment">// 具体实现</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Widget</span>:</span>:Impl&#123;<br><span class="hljs-keyword">public</span>:<br><span class="hljs-comment">//    Impl():name(&quot;test&quot;),width(0.0),height(0.0)&#123;&#125;;</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">draw</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Widget&amp; w)</span> <span class="hljs-keyword">const</span></span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-keyword">if</span> (w.<span class="hljs-built_in">shown</span>())<br>            std::cout &lt;&lt; <span class="hljs-string">&quot;drawing a const component&quot;</span> &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">draw</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Widget&amp; w)</span></span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-keyword">if</span> (w.<span class="hljs-built_in">shown</span>())<br>            std::cout &lt;&lt; <span class="hljs-string">&quot;drawing a non const component&quot;</span> &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">Impl</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span>:n(n)&#123;</span>&#125;;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-keyword">int</span> n;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Widget::draw</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span> </span>&#123;impl_ptr-&gt;<span class="hljs-built_in">draw</span>(*<span class="hljs-keyword">this</span>);&#125;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Widget::draw</span><span class="hljs-params">()</span>  </span>&#123;impl_ptr-&gt;<span class="hljs-built_in">draw</span>(*<span class="hljs-keyword">this</span>);&#125;<br><br><span class="hljs-comment">// 需在外面进行定义 确保Impl 是完整类型</span><br>Widget::<span class="hljs-built_in">Widget</span>(<span class="hljs-keyword">int</span> n):<span class="hljs-built_in">impl_ptr</span>(std::make_unique&lt;Impl&gt;(n))&#123;<br>&#125;<br><br><span class="hljs-comment">//</span><br>Widget::<span class="hljs-built_in">Widget</span>(Widget &amp;&amp;)  <span class="hljs-keyword">noexcept</span> = <span class="hljs-keyword">default</span>;<br>Widget &amp;Widget::<span class="hljs-keyword">operator</span>=(Widget &amp;&amp;)  <span class="hljs-keyword">noexcept</span> = <span class="hljs-keyword">default</span>;<br><br>Widget::~<span class="hljs-built_in">Widget</span>()=<span class="hljs-keyword">default</span>;<br></code></pre></td></tr></table></figure>
+<h3 id="二、-RAII惯用法"><a href="#二、-RAII惯用法" class="headerlink" title="二、 RAII惯用法"></a>二、 RAII惯用法</h3><p>RAII惯用法的使用能够很好地<u>避免由于手动管理资源带来资源泄漏的问题。</u></p>
+<blockquote>
+<p>RAII（Resource Acquisition Is Initialization，资源获取即初始化），是一种<u></u>将必须在使用前请求的资源（如分配的堆内存、执行线程、打开的套接字、打开的文件等）的生命周期与一个对象的生存期相绑定的C++编程技术。</p>
+</blockquote>
+<p>RAII机制保证<u>资源能够用于任何会访问该对象的函数</u>，同时还保证<u>对象在自己生存期结束时会以获取顺序的逆序释放它控制的所有资源。</u></p>
+<p>总的来说，其实就是：</p>
+<ol>
+<li>设计类封装资源（资源绑定对象，生命周期一致性）</li>
+<li>构造函数分配资源 </li>
+<li>析构函数销毁资源</li>
+</ol>
+<p><code>cppreference</code>上的<strong>一个例子</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::mutex m;<br> <br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">bad</span><span class="hljs-params">()</span> </span><br><span class="hljs-function"></span>&#123;<br>    m.<span class="hljs-built_in">lock</span>();                    <span class="hljs-comment">// 请求互斥体</span><br>    <span class="hljs-built_in">f</span>();                         <span class="hljs-comment">// 如果 f() 抛出异常，那么互斥体永远不会被释放</span><br>    <span class="hljs-keyword">if</span>(!<span class="hljs-built_in">everything_ok</span>()) <span class="hljs-keyword">return</span>; <span class="hljs-comment">// 提早返回，互斥体永远不会被释放</span><br>    m.<span class="hljs-built_in">unlock</span>();                  <span class="hljs-comment">// 只有 bad() 抵达此语句，互斥体才会被释放</span><br>&#125;<br> <br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">good</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-function">std::lock_guard&lt;std::mutex&gt; <span class="hljs-title">lk</span><span class="hljs-params">(m)</span></span>; <span class="hljs-comment">// RAII类：互斥体的请求即是初始化</span><br>    <span class="hljs-built_in">f</span>();                               <span class="hljs-comment">// 如果 f() 抛出异常，那么就会释放互斥体</span><br>    <span class="hljs-keyword">if</span>(!<span class="hljs-built_in">everything_ok</span>()) <span class="hljs-keyword">return</span>;       <span class="hljs-comment">// 提早返回也会释放互斥体</span><br>&#125;                                      <span class="hljs-comment">// 如果 good() 正常返回，那么就会释放互斥体</span><br></code></pre></td></tr></table></figure>
+<p>像<code>open()/close()</code>、<code>lock()/unlock()</code>等就是非<code>RAII</code>类的例子，显然其没有利用到对象的生命周期。</p>
+<p>而<code>lock_guard</code>是标准库中提供的<code>RAII</code>包装器，用于管理互斥体，在这里使用，可以看到它管理的是<code>std::mutex</code>，当跳出这个函数时，这个资源就会随着<code>lock_guard</code>对象的释放而释放，无需手动去管理。</p>
+<p>再举一个例子：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HeapObjectWrapper</span>&#123;</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">HeapObjectWrapper</span><span class="hljs-params">(<span class="hljs-keyword">int</span> size)</span></span>&#123;<br>        <span class="hljs-keyword">if</span> (size &lt;= <span class="hljs-number">0</span> || size &gt; <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>)<br>            size = <span class="hljs-number">1024</span>;<br>        m_p = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[size];<br>    &#125;<br><br>    ~<span class="hljs-built_in">HeapObjectWrapper</span>()&#123;<br><br>        <span class="hljs-keyword">delete</span>[] m_p;<br>        m_p = <span class="hljs-literal">nullptr</span>;<br><br>        std::cout &lt;&lt; <span class="hljs-string">&quot;自动释放资源...&quot;</span>  &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>    &#125;<br><br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-keyword">char</span> * m_p;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-function">HeapObjectWrapper <span class="hljs-title">obj</span><span class="hljs-params">(<span class="hljs-number">1024</span>)</span></span>;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<span class="hljs-comment">// 到达这里 申请的资源会被释放</span><br></code></pre></td></tr></table></figure>
+<p>在<code>main</code>函数中向堆中申请了1024个堆上的字节，在<code>main</code>函数结束就会调用<code>obj</code>对象的析构函数进行资源的销毁，依然是无需用户手动管理资源，紧紧地跟对象生命周期绑定了。</p>
+<p>RAII<strong>非常适用于在使用前就需要分配的资源</strong>，<strong>不适用于不会在使用前请求的资源</strong>（如CPU时间、核心等）</p>
+<blockquote>
+<p>标准库中也提供了很多包装器来管理用户资源：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zh.cppreference.com/w/cpp/memory/unique_ptr">std::unique_ptr</a> 及 <a target="_blank" rel="noopener" href="https://zh.cppreference.com/w/cpp/memory/shared_ptr">std::shared_ptr</a> 用于管理动态分配的内存，或以用户提供的删除器管理任何以普通指针表示的资源；</li>
+<li><a target="_blank" rel="noopener" href="https://zh.cppreference.com/w/cpp/thread/lock_guard">std::lock_guard</a>、<a target="_blank" rel="noopener" href="https://zh.cppreference.com/w/cpp/thread/unique_lock">std::unique_lock</a>、<a target="_blank" rel="noopener" href="https://zh.cppreference.com/w/cpp/thread/shared_lock">std::shared_lock</a> 用于管理互斥体。</li>
+</ul>
+</blockquote>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://herbsutter.com/gotw/_100/">GotW #100: Compilation Firewalls (Difficulty: 6/10) – Sutter’s Mill (herbsutter.com)</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/language/pimpl">PImpl - cppreference.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/458947637">C++编程技巧: Pimpl - 知乎 (zhihu.com)</a></li>
+<li><a target="_blank" rel="noopener" href="https://zh.cppreference.com/w/cpp/language/raii">RAII - cppreference.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://simonzgx.github.io/2020/07/01/C++-RAII惯用法/">RAII 惯用法 - Blog (simonzgx.github.io)</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/34660259">c++经验之谈一：RAII原理介绍 - 知乎 (zhihu.com)</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C-C/" class="category-chain-item">C/C++</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C-C/">#C/C++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>C++中的Pimpl和RAII惯用法</div>
+      <div>http://1291945816.github.io/2023/08/27/C++中的Pimpl和RAII惯用法/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hps</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年8月27日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年12月23日</div>
+        </div>
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/09/11/Linux%E4%B8%AD%E7%9A%84%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%EF%BC%88virtual-file-system%EF%BC%89/" title="Linux中的虚拟文件系统（virtual file system）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Linux中的虚拟文件系统（virtual file system）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/13/%E5%80%9F%E5%8A%A9%E4%BB%A3%E7%90%86%E8%A7%A3%E5%86%B3github%E8%A2%AB%E5%A2%99/" title="借助代理解决github被墙">
+                        <span class="hidden-mobile">借助代理解决github被墙</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.3.2/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.3.2/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comment-waline-qx71mhz0j-1291945816.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["mail"],"lang":"zh-CN","emoji":["https://unpkg.com/@waline/emojis@1.0.1/bilibili","https://unpkg.com/@waline/emojis@1.0.1/qq","https://unpkg.com/@waline/emojis@1.0.1/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love" style="color:red"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      <!-- 黄丕松增 -->
+      <!--《添加网站运行时间 -->
+<br/>
+
+<span id="bulidSiteTime">载入建站时间...</span>
+<br/>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+var now = new Date(); 
+
+function createtime() {
+    //此处修改你的建站时间或者网站上线时间
+    var grt = new Date('11/20/2021 21:00:00');
+    now.setTime(now.getTime() + 250);
+    days = (now - grt) / 1000 / 60 / 60 / 24;
+
+    dnum = Math.floor(days);
+    hours = (now - grt) / 1000 / 60 / 60 - (24 * dnum);
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+        hnum = "0" + hnum;
+    }
+    minutes = (now - grt) / 1000 / 60 - (24 * 60 * dnum) - (60 * hnum);
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+        mnum = "0" + mnum;
+    }
+    seconds = (now - grt) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+        snum = "0" + snum;
+    }
+    nowYear=now.getFullYear();
+    document.getElementById("bulidSiteTime").innerHTML="©2021-"+nowYear+" PSONG ALL Rights Reserved";
+    document.getElementById("timeDate").innerHTML = " 本站已安全运行 " + dnum + " 天 ";
+    document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+}
+setInterval("createtime()", 250);
+</script>
+
+<!-- 添加网站运行时间》-->
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      桂ICP备20004780号
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        MathJax = {
+          tex    : {
+            inlineMath: { '[+]': [['$', '$']] }
+          },
+          loader : {
+            load: ['ui/lazy']
+          },
+          options: {
+            renderActions: {
+              findScript    : [10, doc => {
+                document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                  const display = !!node.type.match(/; *mode=display/);
+                  const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                  const text = document.createTextNode('');
+                  node.parentNode.replaceChild(text, node);
+                  math.start = { node: text, delim: '', n: 0 };
+                  math.end = { node: text, delim: '', n: 0 };
+                  doc.math.push(math);
+                });
+              }, '', false],
+              insertedScript: [200, () => {
+                document.querySelectorAll('mjx-container').forEach(node => {
+                  let target = node.parentNode;
+                  if (target.nodeName.toLowerCase() === 'li') {
+                    target.parentNode.classList.add('has-jax');
+                  }
+                });
+              }, '', false]
+            }
+          }
+        };
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.0/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

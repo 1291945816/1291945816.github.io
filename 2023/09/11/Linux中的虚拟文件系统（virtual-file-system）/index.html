@@ -1,0 +1,945 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hps">
+  <meta name="keywords" content="青春|技术">
+  
+    <meta name="description" content="要回答为何Linux系统能够支持多种不同类型的文件系统？是怎么做到的？这就得研究一下Linux中的虚拟文件系统（简写为VFS），才能给出答案了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux中的虚拟文件系统（virtual file system）">
+<meta property="og:url" content="http://1291945816.github.io/2023/09/11/Linux%E4%B8%AD%E7%9A%84%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%EF%BC%88virtual-file-system%EF%BC%89/index.html">
+<meta property="og:site_name" content="pSomng&#39;s blog">
+<meta property="og:description" content="要回答为何Linux系统能够支持多种不同类型的文件系统？是怎么做到的？这就得研究一下Linux中的虚拟文件系统（简写为VFS），才能给出答案了。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://1291945816.github.io/2023/09/11/Linux%E4%B8%AD%E7%9A%84%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%EF%BC%88virtual-file-system%EF%BC%89/VFS.jpg">
+<meta property="og:image" content="http://1291945816.github.io/2023/09/11/Linux%E4%B8%AD%E7%9A%84%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%EF%BC%88virtual-file-system%EF%BC%89/image-20230910215648282.png">
+<meta property="article:published_time" content="2023-09-11T09:22:52.000Z">
+<meta property="article:modified_time" content="2023-12-23T05:06:34.000Z">
+<meta property="article:author" content="Hps">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="VFS">
+<meta property="article:tag" content="filesystem">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://1291945816.github.io/2023/09/11/Linux%E4%B8%AD%E7%9A%84%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%EF%BC%88virtual-file-system%EF%BC%89/VFS.jpg">
+  
+  
+  
+  <title>Linux中的虚拟文件系统（virtual file system） - pSomng&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1291945816.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"❡"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"N6Yv4jtmqdE8UlvY3sF47iku-MdYXbMMI","app_key":"YEW5UmNoyIuo9iD5knjfctWf","server_url":null,"path":"window.location.pathname","ignore_local":true}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="pSomng's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pSomng&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/comment/">
+                <i class="iconfont icon-bookmark-fill"></i>
+                留言板
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Linux中的虚拟文件系统（virtual file system）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-09-11 09:22" pubdate>
+          2023/09/11 09:22
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Linux中的虚拟文件系统（virtual file system）</h1>
+            
+            <div class="markdown-body">
+              
+              <div class="note note-primary">
+            <p>要回答为何Linux系统能够支持多种不同类型的文件系统？是怎么做到的？这就得研究一下Linux中的虚拟文件系统（简写为<code>VFS</code>），才能给出答案了。</p>
+          </div>
+<span id="more"></span>
+<p><strong>虚拟文件系统（VFS）</strong>是一个处于内核中的软件层，它的作用为：</p>
+<ul>
+<li>对于用户空间的程序来说，提供文件系统接口；</li>
+<li>对于文件系统来说，提供一个统一抽象，由具体文件系统来实现细节。</li>
+</ul>
+<p><img src="VFS.jpg" srcset="/img/loading.gif" lazyload alt="VFS"></p>
+<blockquote>
+<p>类似于面向对象思想中的<strong>接口</strong>，规范是已经统一的，而如何去实现规范就看各文件系统如何操作了。</p>
+</blockquote>
+<h3 id="1-VFS中的基本抽象数据结构"><a href="#1-VFS中的基本抽象数据结构" class="headerlink" title="1 VFS中的基本抽象数据结构"></a>1 VFS中的基本抽象数据结构</h3><blockquote>
+<p>了解一个具体的模块，首先要从它实现的数据结构出发，理解了才能更好地解析其调用过程。</p>
+</blockquote>
+<p><code>VFS</code>核心的四个数据结构为：</p>
+<ul>
+<li><code>super_block</code> ：<em>超级块</em>，用于描述具体的文件系统信息</li>
+<li><code>inode</code>：<em>索引节点</em>，用以描述一个文件的元信息，如文件大小、权限、拥有者等，每个文件均对应一个<code>inode</code></li>
+<li><code>dentry</code>：<em>目录项结构</em>，它的出现就是为了性能，一般在磁盘中是没有对应的结构的</li>
+<li><code>file</code>：<code>文件结构</code>，代表与进程交互过程中被打开的一个文件</li>
+</ul>
+<h4 id="1-1-超级块"><a href="#1-1-超级块" class="headerlink" title="1.1 超级块"></a>1.1 超级块</h4><p>一个具体的文件系统，如<code>ext2</code>、<code>ext4</code>等，都会对应一个超级块结构。内核也是通过扫描这个结构的信息来确定文件系统的大致信息，以下为其在内核源码中的部分定义（选自<code>Linux 5.19</code>，后续一样）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">super_block</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">s_list</span>;</span>		<span class="hljs-comment">// 指向超级块链表的指针</span><br>	<span class="hljs-keyword">dev_t</span>			s_dev;		<span class="hljs-comment">/* 块设备的具体标识号 */</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span>		s_blocksize_bits;<br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>		s_blocksize; <span class="hljs-comment">// 文件系统中的数据块大小</span><br>	<span class="hljs-keyword">loff_t</span>			s_maxbytes;	<span class="hljs-comment">/* 允许的最大文件的大小 */</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_system_type</span>	*<span class="hljs-title">s_type</span>;</span> <span class="hljs-comment">// 具体的文件系统类型</span><br>	<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">super_operations</span>	*<span class="hljs-title">s_op</span>;</span> <span class="hljs-comment">// 用于超级块操作的函数集合</span><br>	<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">quotactl_ops</span>	*<span class="hljs-title">s_qcop</span>;</span> <span class="hljs-comment">// 限额操作的函数集合</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>		s_flags; <span class="hljs-comment">// 安装表示</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>		s_magic; <span class="hljs-comment">// 幻数 一般可以用于表示唯一的文件系统</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry</span>		*<span class="hljs-title">s_root</span>;</span> <span class="hljs-comment">//根dentry</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rw_semaphore</span>	<span class="hljs-title">s_umount</span>;</span> <span class="hljs-comment">// 同步读写</span><br>	<span class="hljs-keyword">int</span>			s_count; <span class="hljs-comment">// 超级块的使用计数</span><br>	<span class="hljs-keyword">atomic_t</span>		s_active;<br>	<span class="hljs-keyword">void</span>			*s_fs_info;	<span class="hljs-comment">/* 文件系统的隐私信息 */</span><br>	<span class="hljs-comment">/* c/m/atime限制 */</span><br>	<span class="hljs-keyword">time64_t</span>		   s_time_min;<br>	<span class="hljs-keyword">time64_t</span>		   s_time_max;<br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>		s_max_links;<br>	<span class="hljs-keyword">fmode_t</span>			s_mode;<br>    <span class="hljs-comment">// 默认的目录项操作集合</span><br>	<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry_operations</span> *<span class="hljs-title">s_d_op</span>;</span> <span class="hljs-comment">/* default d_op for dentries */</span><br>    <span class="hljs-comment">// 虽然链接数目为0 但仍然被引用</span><br>	<span class="hljs-keyword">atomic_long_t</span> s_remove_count;<br>    <span class="hljs-comment">// 没有被使用的dentry、inode会被加入这个</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_lru</span>		<span class="hljs-title">s_dentry_lru</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_lru</span>		<span class="hljs-title">s_inode_lru</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rcu_head</span>		<span class="hljs-title">rcu</span>;</span><br>	<span class="hljs-comment">/* s_inode_list_lock protects s_inodes */</span><br>	<span class="hljs-keyword">spinlock_t</span>		s_inode_list_lock ____cacheline_aligned_in_smp;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">s_inodes</span>;</span>	<span class="hljs-comment">/* 所有的索引节点 由前面的锁进行保护 */</span><br><br>	<span class="hljs-keyword">spinlock_t</span>		s_inode_wblist_lock;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">s_inodes_wb</span>;</span>	<span class="hljs-comment">/* writeback inodes */</span><br>    ......<br>&#125; __randomize_layout;<br></code></pre></td></tr></table></figure>
+<p>超级块的操作函数集合：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">super_operations</span> &#123;</span><br>    <span class="hljs-comment">//给超级块分配索引节点</span><br>   	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span> *(*<span class="hljs-title">alloc_inode</span>)(<span class="hljs-keyword">struct</span> <span class="hljs-title">super_block</span> *<span class="hljs-title">sb</span>);</span> <br>    <span class="hljs-comment">// 销毁索引节点</span><br>	<span class="hljs-keyword">void</span> (*destroy_inode)(struct inode *);<br>	<span class="hljs-comment">// 检查atime的更新情况</span><br>   	<span class="hljs-keyword">void</span> (*dirty_inode) (struct inode *, <span class="hljs-keyword">int</span> flags);<br>    <span class="hljs-comment">// 写入一个inode到磁盘中</span><br>	<span class="hljs-keyword">int</span> (*write_inode) (struct inode *, struct writeback_control *wbc);<br>    <span class="hljs-comment">// 删除一个inode</span><br>	<span class="hljs-keyword">int</span> (*drop_inode) (struct inode *);<br>    <span class="hljs-comment">//在链接数目为0时会进行释放</span><br>	<span class="hljs-keyword">void</span> (*evict_inode) (struct inode *);<br>    <span class="hljs-comment">// 释放超级块所占用的内存</span><br>	<span class="hljs-keyword">void</span> (*put_super) (struct super_block *);<br>    ......<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>这些集合的函数会由<strong>具体的文件系统</strong>进行实现，没有实现的会被置为<code>NULL</code></p>
+<h4 id="1-2-索引节点"><a href="#1-2-索引节点" class="headerlink" title="1.2 索引节点"></a>1.2 索引节点</h4><p>Linux中是<strong>视一切为文件</strong>，一个文件就会有对应的<code>inode</code>，文件包含了常规文件、目录等。在需要时，在磁盘中的<code>inode</code>会被拷贝到内存中，修改完毕后会被写回到磁盘中。一个<code>inode</code>会被指向多个目录项索引（硬链接等）</p>
+<p>以下为它在内核中的部分源码定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span> &#123;</span><br>	<span class="hljs-keyword">umode_t</span>			i_mode; <br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span>		i_opflags;<br>	<span class="hljs-keyword">kuid_t</span>			i_uid; <span class="hljs-comment">// 文件所属的用户</span><br>	<span class="hljs-keyword">kgid_t</span>			i_gid; <span class="hljs-comment">// 文件所属的组</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>		i_flags;<br><br><br>	<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode_operations</span>	*<span class="hljs-title">i_op</span>;</span> <span class="hljs-comment">// 索引节点操作函数集</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">super_block</span>	*<span class="hljs-title">i_sb</span>;</span> <span class="hljs-comment">// 文件所在文件系统的超级块</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">address_space</span>	*<span class="hljs-title">i_mapping</span>;</span><br><br><br>	<span class="hljs-comment">/* Stat data, not accessed from path walking */</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>		i_ino; <span class="hljs-comment">// 索引号</span><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * Filesystems may only read i_nlink directly.  They shall use the</span><br><span class="hljs-comment">	 * following functions for modification:</span><br><span class="hljs-comment">	 *</span><br><span class="hljs-comment">	 *    (set|clear|inc|drop)_nlink</span><br><span class="hljs-comment">	 *    inode_(inc|dec)_link_count</span><br><span class="hljs-comment">	 */</span><br>	<span class="hljs-class"><span class="hljs-keyword">union</span> &#123;</span><br>		<span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i_nlink; <span class="hljs-comment">// 链接数目</span><br>		<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> __i_nlink;<br>	&#125;;<br>	<span class="hljs-keyword">dev_t</span>			i_rdev; <span class="hljs-comment">// 文件所在的设备号</span><br>	<span class="hljs-keyword">loff_t</span>			i_size; <span class="hljs-comment">// 文件大小</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timespec64</span>	<span class="hljs-title">i_atime</span>;</span><span class="hljs-comment">// 最后的访问时间</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timespec64</span>	<span class="hljs-title">i_mtime</span>;</span> <span class="hljs-comment">// 最后修改时间</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timespec64</span>	<span class="hljs-title">i_ctime</span>;</span> <span class="hljs-comment">// 最后改变时间</span><br>	<span class="hljs-keyword">spinlock_t</span>		i_lock;	<span class="hljs-comment">/* i_blocks, i_bytes, maybe i_size */</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span>          i_bytes; <span class="hljs-comment">// 使用的字节数</span><br><br>	<span class="hljs-comment">/* Misc */</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span>		i_state;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rw_semaphore</span>	<span class="hljs-title">i_rwsem</span>;</span> <span class="hljs-comment">// 读写信号量</span><br><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">hlist_node</span>	<span class="hljs-title">i_hash</span>;</span> <span class="hljs-comment">// 哈希值 负责提高查找效率</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">i_io_list</span>;</span>	<span class="hljs-comment">/* backing dev IO list */</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">i_lru</span>;</span>		<span class="hljs-comment">/* inode LRU list  未使用的inode*/</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">i_sb_list</span>;</span> <span class="hljs-comment">// 链接一个文件系统中的inode链表</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">i_wb_list</span>;</span>	<span class="hljs-comment">/* backing dev writeback list */</span><br>	<span class="hljs-class"><span class="hljs-keyword">union</span> &#123;</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">hlist_head</span>	<span class="hljs-title">i_dentry</span>;</span> <span class="hljs-comment">// 所属的目录项</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rcu_head</span>		<span class="hljs-title">i_rcu</span>;</span><br>	&#125;;<br>	<span class="hljs-keyword">atomic64_t</span>		i_version; <span class="hljs-comment">// 索引节点版本号</span><br>	<span class="hljs-keyword">atomic_t</span>		i_count; <span class="hljs-comment">// 引用计数</span><br>	<span class="hljs-keyword">atomic_t</span>		i_writecount; <span class="hljs-comment">// 写计数</span><br>    <span class="hljs-comment">// 文件操作函数集合</span><br>	<span class="hljs-class"><span class="hljs-keyword">union</span> &#123;</span><br>		<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span>	*<span class="hljs-title">i_fop</span>;</span>	<span class="hljs-comment">/* former -&gt;i_op-&gt;default_file_ops */</span><br>		<span class="hljs-keyword">void</span> (*free_inode)(struct inode *);<br>	&#125;;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">address_space</span>	<span class="hljs-title">i_data</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span>	<span class="hljs-title">i_devices</span>;</span><br>	<span class="hljs-keyword">void</span>			*i_private; <span class="hljs-comment">/* 文件与设备的私有指针 */</span><br>    ......<br>&#125; __randomize_layout;<br></code></pre></td></tr></table></figure>
+<p>索引节点的函数操作集合：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode_operations</span> &#123;</span><br>    <span class="hljs-comment">// 查找指定文件的dentry</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry</span> * (*<span class="hljs-title">lookup</span>) (<span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span> *,<span class="hljs-keyword">struct</span> <span class="hljs-title">dentry</span> *, <span class="hljs-title">unsigned</span> <span class="hljs-title">int</span>);</span><br>	<span class="hljs-comment">//根据inode所描述的文件类型，如果是目录，则会创建一个inode，不是则不会调用</span><br>	<span class="hljs-keyword">int</span> (*create) (struct user_namespace *, struct inode *,struct dentry *,<br>		       <span class="hljs-keyword">umode_t</span>, <span class="hljs-keyword">bool</span>);<br>    <span class="hljs-comment">//在指定目录下创建一个子目录</span><br>	<span class="hljs-keyword">int</span> (*mkdir) (struct user_namespace *, struct inode *,struct dentry *,<br>		      <span class="hljs-keyword">umode_t</span>);<br>    <span class="hljs-comment">//从inode所描述的目录中删除一个子目录时，会被调用</span><br>	<span class="hljs-keyword">int</span> (*rmdir) (struct inode *,struct dentry *);<br>    ......<br>&#125; ____cacheline_aligned;<br></code></pre></td></tr></table></figure>
+<h4 id="1-3-目录项结构"><a href="#1-3-目录项结构" class="headerlink" title="1.3 目录项结构"></a>1.3 目录项结构</h4><p>它的出现主要是<strong>为了查找性能</strong>，只存在于内存中，而不存在于磁盘中。<u>这提供了一种非常快的查询机制来将一个路径名称（文件名称）转换为特定的目录项对象。</u></p>
+<p>以下为它在内核中的部分源码定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry</span> &#123;</span><br>	<span class="hljs-comment">/* RCU lookup touched fields */</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> d_flags;		<span class="hljs-comment">/* protected by d_lock */</span><br>	<span class="hljs-keyword">seqcount_spinlock_t</span> d_seq;	<span class="hljs-comment">/* per dentry seqlock */</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">hlist_bl_node</span> <span class="hljs-title">d_hash</span>;</span>	<span class="hljs-comment">/* lookup hash list 哈希列表*/</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry</span> *<span class="hljs-title">d_parent</span>;</span>	<span class="hljs-comment">/* parent directory 父目录 */</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">qstr</span> <span class="hljs-title">d_name</span>;</span> <br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span> *<span class="hljs-title">d_inode</span>;</span>		<span class="hljs-comment">/*与目录关联的inode Where the name belongs to - NULL is</span><br><span class="hljs-comment">					 * negative */</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> d_iname[DNAME_INLINE_LEN];	<span class="hljs-comment">/* small names */</span><br><br>	<span class="hljs-comment">/* Ref lookup also touches following */</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">lockref</span> <span class="hljs-title">d_lockref</span>;</span>	<span class="hljs-comment">/* per-dentry lock and refcount */</span><br>	<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry_operations</span> *<span class="hljs-title">d_op</span>;</span> <span class="hljs-comment">// 目录项操作</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">super_block</span> *<span class="hljs-title">d_sb</span>;</span>	<span class="hljs-comment">/* 目录项所属文件系统的超级块 The root of the dentry tree */</span><br><br><br>	<span class="hljs-class"><span class="hljs-keyword">union</span> &#123;</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">d_lru</span>;</span>		<span class="hljs-comment">/* LRU list 未使用目录项以LRU算法链接的链表*/</span><br>		<span class="hljs-keyword">wait_queue_head_t</span> *d_wait;	<span class="hljs-comment">/* in-lookup ones only */</span><br>	&#125;;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">d_child</span>;</span>	<span class="hljs-comment">/* child of parent list 加入到父目录的d_subdirs */</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">d_subdirs</span>;</span>	<span class="hljs-comment">/* our children 子目录 */</span><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * d_alias and d_rcu can share memory</span><br><span class="hljs-comment">	 */</span><br>	<span class="hljs-class"><span class="hljs-keyword">union</span> &#123;</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">hlist_node</span> <span class="hljs-title">d_alias</span>;</span>	<span class="hljs-comment">/* inode alias list */</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">hlist_bl_node</span> <span class="hljs-title">d_in_lookup_hash</span>;</span>	<span class="hljs-comment">/* only for in-lookup ones */</span><br>	 	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rcu_head</span> <span class="hljs-title">d_rcu</span>;</span><br>	&#125; d_u;<br>&#125; __randomize_layout;<br></code></pre></td></tr></table></figure>
+<p>目录项的函数操作集合：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry_operations</span> &#123;</span><br>    <span class="hljs-comment">// 检查当前目录项是否还有效</span><br>	<span class="hljs-keyword">int</span> (*d_revalidate)(struct dentry *, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>);<br>    <span class="hljs-comment">// 较弱形式的校验</span><br>	<span class="hljs-keyword">int</span> (*d_weak_revalidate)(struct dentry *, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span>);<br>    <span class="hljs-comment">// </span><br>	<span class="hljs-keyword">int</span> (*d_hash)(<span class="hljs-keyword">const</span> struct dentry *, struct qstr *);<br>    <span class="hljs-comment">// 引用计数为0时删除dentry（dput调用）</span><br>	<span class="hljs-keyword">int</span> (*d_delete)(<span class="hljs-keyword">const</span> struct dentry *);<br>    <span class="hljs-comment">// 释放所占有的数据</span><br>	<span class="hljs-keyword">void</span> (*d_release)(struct dentry *);<br>    <span class="hljs-comment">//当dentry失去inode时调用，</span><br>	<span class="hljs-keyword">void</span> (*d_iput)(struct dentry *, struct inode *);<br>......<br>&#125; ____cacheline_aligned;<br></code></pre></td></tr></table></figure>
+<h4 id="1-4-文件结构"><a href="#1-4-文件结构" class="headerlink" title="1.4 文件结构"></a>1.4 文件结构</h4><p><strong>当一个进程打开一个文件时，该文件就是用此文件结构进行描述的</strong>，如文件的读写模式、读写偏移量、所属inode等信息。这个文件结构会被进程的文件描述符表所存放。</p>
+<p>以下为它在内核中的部分源码定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file</span> &#123;</span><br>	<span class="hljs-class"><span class="hljs-keyword">union</span> &#123;</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">llist_node</span>	<span class="hljs-title">fu_llist</span>;</span> <span class="hljs-comment">// 文件系统中被打开的文件对象（单个进程所打开的文件会被维护在另一个结构中 files_struct）</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rcu_head</span> 	<span class="hljs-title">fu_rcuhead</span>;</span> <br>	&#125; f_u;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">path</span>		<span class="hljs-title">f_path</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span>		*<span class="hljs-title">f_inode</span>;</span>	<span class="hljs-comment">/* cached value  被缓存的值 所属的inode吧*/</span><br>	<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span>	*<span class="hljs-title">f_op</span>;</span> <span class="hljs-comment">// 文件操作指针</span><br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * Protects f_ep, f_flags.</span><br><span class="hljs-comment">	 * Must not be taken from IRQ context.</span><br><span class="hljs-comment">	 */</span><br>	<span class="hljs-keyword">spinlock_t</span>		f_lock;    <span class="hljs-comment">// 自旋锁</span><br>	<span class="hljs-keyword">atomic_long_t</span>		f_count; <span class="hljs-comment">// 引用计数器</span><br>	<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> 		f_flags; <span class="hljs-comment">// 打开文件所引用的标志</span><br>	<span class="hljs-keyword">fmode_t</span>			f_mode;  <span class="hljs-comment">// 文件的访问模式（r模式等）</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mutex</span>		<span class="hljs-title">f_pos_lock</span>;</span><br>	<span class="hljs-keyword">loff_t</span>			f_pos; <span class="hljs-comment">// 读写偏移量</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">fown_struct</span>	<span class="hljs-title">f_owner</span>;</span> <span class="hljs-comment">// 所属者信息</span><br><br>	u64			f_version; <span class="hljs-comment">// 版本号</span><br><br>	<span class="hljs-comment">/* needed for tty driver, and maybe others */</span><br>	<span class="hljs-keyword">void</span>			*private_data;          <span class="hljs-comment">//隐私数据</span><br><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">address_space</span>	*<span class="hljs-title">f_mapping</span>;</span><br><br>&#125; __randomize_layout<br>  __attribute__((aligned(<span class="hljs-number">4</span>)));	<span class="hljs-comment">/* lest something weird decides that 2 is OK */</span><br></code></pre></td></tr></table></figure>
+<p>文件结构的函数操作集合：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span> &#123;</span><br>	.......<br>    <span class="hljs-comment">// 移动文件指针</span><br>	<span class="hljs-keyword">loff_t</span> (*llseek) (struct file *, <span class="hljs-keyword">loff_t</span>, <span class="hljs-keyword">int</span>);<br>    <span class="hljs-comment">// 从文件对象中读数据（系统调用中的读最终会被应用于此）</span><br>	<span class="hljs-keyword">ssize_t</span> (*read) (struct file *, <span class="hljs-keyword">char</span> __user *, <span class="hljs-keyword">size_t</span>, <span class="hljs-keyword">loff_t</span> *);<br>    <span class="hljs-comment">// 从文件对象中写数据</span><br>	<span class="hljs-keyword">ssize_t</span> (*write) (struct file *, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> __user *, <span class="hljs-keyword">size_t</span>, <span class="hljs-keyword">loff_t</span> *);<br>    ......<br>&#125; __randomize_layout;<br></code></pre></td></tr></table></figure>
+<h4 id="1-5-它们的关系"><a href="#1-5-它们的关系" class="headerlink" title="1.5 它们的关系"></a>1.5 它们的关系</h4><blockquote>
+<p>很早就查过<code>dentry</code>、<code>inode</code>之间的关系了，但是过了一段时间还是会忘记它们之间的关系，这实际反映了这些关系并不是那么好去去理解的，那么在这里我就通过一张图来描述它们之间的关系。</p>
+</blockquote>
+<p><img src="image-20230910215648282.png" srcset="/img/loading.gif" lazyload alt="image-20230910215648282" style="zoom: 67%;" /></p>
+<p>在这张图中，需要额外的关注的是，<code>inode</code>、<code>dentry</code>、<code>super_block</code>之间是有链接关系的，而<code>file</code>并不需要跟它们之间存在链接关系的（不同的<code>Linux</code>的大版本会存在部分不同），构建<code>file</code>的方式是通过解析路径而从获得<code>dentry</code>、<code>inode</code>然后再用这些数据初始化它，具体细节可以分析文件的打开流程。</p>
+<blockquote>
+<p>这个关系也是比较简单的，实际上<code>inode</code>可能会被多个<code>dentry</code>所指向。</p>
+</blockquote>
+<h3 id="2-文件系统的注册与注销"><a href="#2-文件系统的注册与注销" class="headerlink" title="2 文件系统的注册与注销"></a>2 文件系统的注册与注销</h3><p><strong>注册</strong></p>
+<p>前面说到<code>VFS</code>提供了统一的抽象接口供给具体的文件系统去实现，为了让<code>Linux</code>内核去发现真实的文件系统，那么就需要使用<code>register_filesystem</code>去注册。该函数的实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">register_filesystem</span><span class="hljs-params">(struct file_system_type * fs)</span></span><br><span class="hljs-function"></span>&#123;<br>	<span class="hljs-keyword">int</span> res = <span class="hljs-number">0</span>;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_system_type</span> ** <span class="hljs-title">p</span>;</span><br><br>	<span class="hljs-keyword">if</span> (fs-&gt;parameters &amp;&amp;<br>	    !fs_validate_description(fs-&gt;name, fs-&gt;parameters)) <span class="hljs-comment">// 文件系统校验</span><br>		<span class="hljs-keyword">return</span> -EINVAL;<br><br>	BUG_ON(<span class="hljs-built_in">strchr</span>(fs-&gt;name, <span class="hljs-string">&#x27;.&#x27;</span>));<br>	<span class="hljs-keyword">if</span> (fs-&gt;next)<br>		<span class="hljs-keyword">return</span> -EBUSY;<br>	<span class="hljs-comment">// 保护资源</span><br>	write_lock(&amp;file_systems_lock);<br>	p = find_filesystem(fs-&gt;name, <span class="hljs-built_in">strlen</span>(fs-&gt;name)); <span class="hljs-comment">// 遍历已经注册的文件系统</span><br>	<span class="hljs-keyword">if</span> (*p) <span class="hljs-comment">//已经注册 </span><br>		res = -EBUSY;<br>	<span class="hljs-keyword">else</span><span class="hljs-comment">// 为NULL</span><br>		*p = fs;<br>	write_unlock(&amp;file_systems_lock);<br>	<span class="hljs-keyword">return</span> res;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这个函数的实现思想也是很简单的，相当于是将当前<code>fs</code>加入到<strong>全局链表</strong>中，这样当Linux启动时，会遍历所有注册过的文件系统来识别磁盘中的文件系统（根据超级块<code>super_block</code>的信息）。</p>
+<p>从函数参数可以看到，这个参数类型是<code>struct file_system_type</code>，所有具体的文件系统都需要定义一个这样的实体,它的类型定义为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_system_type</span> &#123;</span><br>	<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *name;  <span class="hljs-comment">// 文件系统名称</span><br>	<span class="hljs-keyword">int</span> fs_flags; <span class="hljs-comment">// 标志</span><br>	<span class="hljs-keyword">int</span> (*init_fs_context)(struct fs_context *); <span class="hljs-comment">// 文件系统上下文</span><br>	<span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">fs_parameter_spec</span> *<span class="hljs-title">parameters</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dentry</span> *(*<span class="hljs-title">mount</span>) (<span class="hljs-keyword">struct</span> <span class="hljs-title">file_system_type</span> *, <span class="hljs-title">int</span>,</span><br><span class="hljs-class">		       <span class="hljs-title">const</span> <span class="hljs-title">char</span> *, <span class="hljs-title">void</span> *);</span> <span class="hljs-comment">// 挂载</span><br>	<span class="hljs-keyword">void</span> (*kill_sb) (struct super_block *);<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">module</span> *<span class="hljs-title">owner</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_system_type</span> * <span class="hljs-title">next</span>;</span> <span class="hljs-comment">// 指向下一个</span><br>    ......<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p><strong>注销</strong></p>
+<p>注销这个文件系统也是相当于直接从文件系统全局列表中进行移除即可。它的函数实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">unregister_filesystem</span><span class="hljs-params">(struct file_system_type * fs)</span></span><br><span class="hljs-function"></span>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_system_type</span> ** <span class="hljs-title">tmp</span>;</span> <br>	write_lock(&amp;file_systems_lock);<br>	tmp = &amp;file_systems;<br>	<span class="hljs-keyword">while</span> (*tmp) &#123;<br>		<span class="hljs-keyword">if</span> (fs == *tmp) &#123;<br>			*tmp = fs-&gt;next;<br>			fs-&gt;next = <span class="hljs-literal">NULL</span>;<br>			write_unlock(&amp;file_systems_lock);<br>			synchronize_rcu(); <span class="hljs-comment">// 阻塞更新</span><br>			<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>		&#125;<br>		tmp = &amp;(*tmp)-&gt;next;<br>	&#125;<br>	write_unlock(&amp;file_systems_lock);<br>	<span class="hljs-keyword">return</span> -EINVAL;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3 总结"></a>3 总结</h3><p>本文从比较简单的角度学习了<code>Linux</code>内核中虚拟文件系统的源码以及其核心数据结构，<strong>如果要继续剖析该模块的内容，其实还可以更深入，如发生系统调用（如<code>read</code>、<code>write</code>等）过程中<code>VFS</code>在此过程中如何处理的。</strong> 但理解这些深入的内容，还是回归基础，搞清楚这个基本的数据结构的定义以及它们背后隐含的关系，才能更好地去分析。</p>
+<p><strong>后续如果来得及的话，会继续分析这部分的内容</strong></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><ul>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/liexusong/linux-source-code-analyze/blob/master/virtual_file_system.md">linux-source-code-analyze/virtual_file_system.md at master · liexusong/linux-source-code-analyze (github.com)</a></p>
+</li>
+<li><p>《深入理解Linux内核》</p>
+</li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Linux/" class="category-chain-item">Linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Linux/">#Linux</a>
+      
+        <a href="/tags/VFS/">#VFS</a>
+      
+        <a href="/tags/filesystem/">#filesystem</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Linux中的虚拟文件系统（virtual file system）</div>
+      <div>http://1291945816.github.io/2023/09/11/Linux中的虚拟文件系统（virtual-file-system）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hps</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年9月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2023年12月23日</div>
+        </div>
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/09/13/%E5%88%9D%E8%AF%86FUSE%EF%BC%88Filesystem-in-userspace%EF%BC%89/" title="初识FUSE（Filesystem in userspace）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">初识FUSE（Filesystem in userspace）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/27/C++%E4%B8%AD%E7%9A%84Pimpl%E5%92%8CRAII%E6%83%AF%E7%94%A8%E6%B3%95/" title="C++中的Pimpl和RAII惯用法">
+                        <span class="hidden-mobile">C++中的Pimpl和RAII惯用法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.3.2/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.3.2/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comment-waline-qx71mhz0j-1291945816.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["mail"],"lang":"zh-CN","emoji":["https://unpkg.com/@waline/emojis@1.0.1/bilibili","https://unpkg.com/@waline/emojis@1.0.1/qq","https://unpkg.com/@waline/emojis@1.0.1/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love" style="color:red"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      <!-- 黄丕松增 -->
+      <!--《添加网站运行时间 -->
+<br/>
+
+<span id="bulidSiteTime">载入建站时间...</span>
+<br/>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+var now = new Date(); 
+
+function createtime() {
+    //此处修改你的建站时间或者网站上线时间
+    var grt = new Date('11/20/2021 21:00:00');
+    now.setTime(now.getTime() + 250);
+    days = (now - grt) / 1000 / 60 / 60 / 24;
+
+    dnum = Math.floor(days);
+    hours = (now - grt) / 1000 / 60 / 60 - (24 * dnum);
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+        hnum = "0" + hnum;
+    }
+    minutes = (now - grt) / 1000 / 60 - (24 * 60 * dnum) - (60 * hnum);
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+        mnum = "0" + mnum;
+    }
+    seconds = (now - grt) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+        snum = "0" + snum;
+    }
+    nowYear=now.getFullYear();
+    document.getElementById("bulidSiteTime").innerHTML="©2021-"+nowYear+" PSONG ALL Rights Reserved";
+    document.getElementById("timeDate").innerHTML = " 本站已安全运行 " + dnum + " 天 ";
+    document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+}
+setInterval("createtime()", 250);
+</script>
+
+<!-- 添加网站运行时间》-->
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      桂ICP备20004780号
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        MathJax = {
+          tex    : {
+            inlineMath: { '[+]': [['$', '$']] }
+          },
+          loader : {
+            load: ['ui/lazy']
+          },
+          options: {
+            renderActions: {
+              findScript    : [10, doc => {
+                document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                  const display = !!node.type.match(/; *mode=display/);
+                  const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                  const text = document.createTextNode('');
+                  node.parentNode.replaceChild(text, node);
+                  math.start = { node: text, delim: '', n: 0 };
+                  math.end = { node: text, delim: '', n: 0 };
+                  doc.math.push(math);
+                });
+              }, '', false],
+              insertedScript: [200, () => {
+                document.querySelectorAll('mjx-container').forEach(node => {
+                  let target = node.parentNode;
+                  if (target.nodeName.toLowerCase() === 'li') {
+                    target.parentNode.classList.add('has-jax');
+                  }
+                });
+              }, '', false]
+            }
+          }
+        };
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.0/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
